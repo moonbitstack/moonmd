@@ -7,6 +7,14 @@
 </p>
 
 <p align="center">
+  <a href="https://moonbitstack.github.io/moonmd/"><b>Site</b></a> ·
+  <a href="https://moonbitstack.github.io/moonmd/guide.html">Guide</a> ·
+  <a href="https://moonbitstack.github.io/moonmd/guide.html#api">API</a> ·
+  <a href="https://mooncakes.io/docs/moonbitstack/moonmd">Mooncakes</a>
+</p>
+
+<p align="center">
+  <sub>
   <a href="#install">Install</a> ·
   <a href="#read-a-document">Read a document</a> ·
   <a href="#the-tree">The tree</a> ·
@@ -14,6 +22,7 @@
   <a href="#streaming">Streaming</a> ·
   <a href="#safety">Safety</a> ·
   <a href="#conformance">Conformance</a>
+  </sub>
 </p>
 
 ## Install
