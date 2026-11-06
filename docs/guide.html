@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guide — moonmd</title>
+<meta name="description" content="Install moonmd, read a document, walk its tree, render HTML and Markdown, and parse text as it arrives.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script>
+(function () {
+  try {
+    var saved = localStorage.getItem("moonmd-theme");
+    if (saved === "ink" || saved === "paper") document.documentElement.setAttribute("data-theme", saved);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="wordmark" href="index.html"><i class="mark"></i>moonmd <span>markdown</span></a>
+    <nav class="nav" aria-label="This site">
+      <a href="index.html">overview</a>
+      <a href="guide.html" aria-current="page">guide</a>
+      <a href="guide.html#api">api</a>
+      <a class="icon-link" href="https://github.com/moonbitstack/moonmd" aria-label="moonmd on GitHub">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-switch" type="button" aria-pressed="false" aria-label="Switch between paper and ink">
+        <span class="track" aria-hidden="true"><span class="knob"></span></span><span class="label">paper</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="sheet">
+  <div class="guide-grid">
+    <aside class="rail scroll" aria-label="Contents">
+      <h4>guide</h4>
+      <ul>
+        <li><a href="#install"><span class="n">01</span>Install</a></li>
+        <li><a href="#document"><span class="n">02</span>A document</a></li>
+        <li><a href="#tree"><span class="n">03</span>The tree</a></li>
+        <li><a href="#html"><span class="n">04</span>HTML</a></li>
+        <li><a href="#markdown"><span class="n">05</span>Markdown</a></li>
+        <li><a href="#stream"><span class="n">06</span>Streaming</a></li>
+        <li><a href="#flavors"><span class="n">07</span>Flavors</a></li>
+      </ul>
+      <h4>reference</h4>
+      <ul>
+        <li><a href="#api"><span class="n">08</span>API</a></li>
+        <li><a href="https://github.com/moonbitstack/moonmd">Source</a></li>
+      </ul>
+    </aside>
+
+    <div class="guide-body">
+      <p class="kicker">the guide</p>
+      <h1 style="font-size:clamp(2rem,4.4vw,3.2rem)">A document, whole and in pieces.</h1>
+      <p class="lede">Install the package, read one document, look at what came out, then read
+        one that is still arriving. Every output below is what the library printed for the code
+        above it.</p>
+
+      <section id="install">
+        <p class="kicker"><span>§01</span></p>
+        <h2>Install</h2>
+        <div class="code" data-lang="text">
+          <div class="code-head"><span>shell</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-install">copy</button></div>
+          <pre><code id="c-install">moon add moonbitstack/moonmd</code></pre>
+        </div>
+        <p>The import alias is a convention, not a requirement. <span class="mono">parse</span>
+          takes a <span class="mono">StringView</span>, so a <span class="mono">String</span> is
+          handed over with <span class="mono">[:]</span>.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-import">copy</button></div>
+          <pre><code id="c-import">import {
+  "moonbitstack/moonmd" @moonmd,
+}</code></pre>
+        </div>
+      </section>
+
+      <section id="document">
+        <p class="kicker"><span>§02</span></p>
+        <h2>A document</h2>
+        <p class="intro">One call reads the text and returns a <span class="mono">Document</span>.
+          It holds the blocks and the flavor it was read with; nothing is rendered until asked.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-doc">copy</button></div>
+          <pre><code id="c-doc">let document = @moonmd.parse("# Notes\n\nA *small* page.\n"[:])
+println(document.html(safe=false))</code></pre>
+        </div>
+        <div class="code output" data-lang="html">
+          <div class="code-head"><span>output</span></div>
+          <pre><code>&lt;h1&gt;Notes&lt;/h1&gt;
+&lt;p&gt;A &lt;em&gt;small&lt;/em&gt; page.&lt;/p&gt;</code></pre>
+        </div>
+        <p>A document that is empty, or holds only blank lines, has no blocks at all. A last line
+          without a line ending is still a line.</p>
+      </section>
+
+      <section id="tree">
+        <p class="kicker"><span>§03</span></p>
+        <h2>The tree</h2>
+        <p>Blocks hold blocks; a paragraph, a heading and a table cell hold inlines. There are
+          eight block kinds and nine inline kinds, and <span class="mono">walk</span> visits each
+          node once, containers before their contents.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-walk">copy</button></div>
+          <pre><code id="c-walk">let document = @moonmd.parse("# Notes\n\n- one\n- two\n"[:])
+@moonmd.walk(document, fn(node) {
+  match node {
+    @moonmd.Block(@moonmd.Heading(heading)) =>
+      println("heading, level \{heading.level}")
+    @moonmd.Block(@moonmd.List(list)) =>
+      println("list of \{list.items.length()}")
+    @moonmd.Inline(@moonmd.Text(text)) => println("text: \{text}")
+    _ => ()
+  }
+})</code></pre>
+        </div>
+        <div class="code output" data-lang="text">
+          <div class="code-head"><span>output</span></div>
+          <pre><code>heading, level 1
+text: Notes
+list of 2
+text: one
+text: two</code></pre>
+        </div>
+        <p>A list item carries a task marker of its own, so a checkbox is data rather than a
+          string that has to be recognised again later.</p>
+      </section>
+
+      <section id="html">
+        <p class="kicker"><span>§04</span></p>
+        <h2>HTML</h2>
+        <p class="intro"><span class="mono">html</span> takes one flag. With the default
+          <span class="mono">safe=true</span>, raw HTML is escaped and a destination that would
+          run script keeps its text and loses its link.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-html">copy</button></div>
+          <pre><code id="c-html">let page = @moonmd.parse("&lt;b&gt;bold&lt;/b&gt; [x](javascript:alert(1))\n"[:])
+println(page.html())
+println(page.html(safe=false))</code></pre>
+        </div>
+        <div class="code output" data-lang="html">
+          <div class="code-head"><span>output</span></div>
+          <pre><code>&lt;p&gt;&amp;lt;b&amp;gt;bold&amp;lt;/b&amp;gt; x&lt;/p&gt;
+&lt;p&gt;&lt;b&gt;bold&lt;/b&gt; &lt;a href="javascript:alert(1)"&gt;x&lt;/a&gt;&lt;/p&gt;</code></pre>
+        </div>
+        <p>The flag is a rendering choice, not a parsing one: the tree is the same either way, so
+          a viewer can offer both without reading the document twice.</p>
+        <div class="callout"><b>safe=false</b> reproduces the HTML the CommonMark examples
+          expect, character for character. Keep it for text you control.</div>
+      </section>
+
+      <section id="markdown">
+        <p class="kicker"><span>§05</span></p>
+        <h2>Markdown</h2>
+        <p>The same tree writes itself back out. The writer escapes what would otherwise start a
+          block, and grows a fence past any run of its own characters inside the code, so the
+          result reads back to the same HTML.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-md">copy</button></div>
+          <pre><code id="c-md">let document = @moonmd.parse("# Notes\n\nA *small* page.\n"[:])
+println(document.markdown())</code></pre>
+        </div>
+        <div class="code output" data-lang="markdown">
+          <div class="code-head"><span>output</span></div>
+          <pre><code># Notes
+
+A *small* page.</code></pre>
+        </div>
+        <p>The output is not the input: a table written with uneven pipes comes back aligned, an
+          indented code block becomes a fence. What survives is the document, not its whitespace.</p>
+      </section>
+
+      <section id="stream">
+        <p class="kicker"><span>§06</span></p>
+        <h2>Streaming</h2>
+        <p class="intro"><span class="mono">feed</span> takes the next chunk and returns the blocks
+          that no later text can change. <span class="mono">finish</span> returns what is left. A
+          chunk may end anywhere, including in the middle of a line.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-stream">copy</button></div>
+          <pre><code id="c-stream">let stream = @moonmd.Stream::new()
+println(stream.feed("# Notes\n\nA *sm"[:]).length())
+println(stream.feed("all* page.\n\n"[:]).length())
+println(stream.finish().length())</code></pre>
+        </div>
+        <div class="code output" data-lang="text">
+          <div class="code-head"><span>output</span></div>
+          <pre><code>1
+1
+0</code></pre>
+        </div>
+        <p>The heading settles when the blank line after it arrives; the paragraph settles when
+          its own blank line does. Nothing is handed out twice and nothing is taken back.</p>
+        <div class="callout"><b>defer_links</b> is on by default: a block that mentions a link
+          label waits for <span class="mono">finish</span>, because a definition written later
+          still applies to it. Pass <span class="mono">defer_links=false</span> to
+          <span class="mono">Stream::new</span> to get such blocks earlier, and accept that a
+          forward reference then stays text.</div>
+      </section>
+
+      <section id="flavors">
+        <p class="kicker"><span>§07</span></p>
+        <h2>Flavors</h2>
+        <p class="intro"><span class="mono">gfm</span> is the default: CommonMark plus tables,
+          strikethrough, bare links, task list markers and the tag filter.
+          <span class="mono">commonmark</span> turns all five off, and a
+          <span class="mono">Flavor</span> literal turns them off one at a time.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-flavor">copy</button></div>
+          <pre><code id="c-flavor">let plain = @moonmd.parse("~~gone~~\n"[:], flavor=@moonmd.commonmark)
+println(plain.html(safe=false))</code></pre>
+        </div>
+        <div class="code output" data-lang="html">
+          <div class="code-head"><span>output</span></div>
+          <pre><code>&lt;p&gt;~~gone~~&lt;/p&gt;</code></pre>
+        </div>
+        <p>A flavor is a plain record, so a caller can take <span class="mono">gfm</span> and
+          clear one field without copying the rest by hand.</p>
+      </section>
+
+      <section id="api">
+        <p class="kicker"><span>§08</span></p>
+        <h2>API reference</h2>
+        <p class="intro">Generated from <span class="mono">pkg.generated.mbti</span> and the doc
+          comments in the source, so this list is the package's interface, not a copy of it.</p>
+        <!-- api:begin -->
+<div class="api-group" id="api-values">
+  <h3>values</h3>
+<div class="entry" id="api-commonmark">
+  <span class="sig"><span class="kw">pub let</span> <span class="name">commonmark</span><span class="arg"> : Flavor</span></span>
+  <p class="doc-p">CommonMark without any of the extensions.</p>
+</div>
+<div class="entry" id="api-flavor">
+  <span class="sig"><span class="kw">pub let</span> <span class="name">flavor</span><span class="arg"> : Flavor</span></span>
+  <p class="doc-p">The preset <code>parse</code> uses when the caller does not pass one: <code>gfm</code>.</p>
+</div>
+<div class="entry" id="api-gfm">
+  <span class="sig"><span class="kw">pub let</span> <span class="name">gfm</span><span class="arg"> : Flavor</span></span>
+  <p class="doc-p">CommonMark as GitHub reads it: tables, strikethrough, bare links, task list items and the tag filter. This is the default.</p>
+</div>
+</div>
+<div class="api-group" id="api-functions">
+  <h3>functions</h3>
+<div class="entry" id="api-parse">
+  <span class="sig"><span class="kw">pub fn</span> <span class="name">parse</span><span class="arg">(StringView, flavor? : Flavor) -&gt; Document</span></span>
+  <p class="doc-p">Parse a Markdown document.</p>
+  <pre class="doc-code"><code>test {
+    let document = @moonmd.parse("# Title")
+    assert_eq(document.html(safe=false), "&lt;h1&gt;Title&lt;/h1&gt;\n")
+  }</code></pre>
+</div>
+<div class="entry" id="api-walk">
+  <span class="sig"><span class="kw">pub fn</span> <span class="name">walk</span><span class="arg">(Document, (Node) -&gt; Unit) -&gt; Unit</span></span>
+  <p class="doc-p">Visit every node of the document, each container before its children and siblings in order.</p>
+</div>
+</div>
+<div class="api-group" id="api-types">
+  <h3>types</h3>
+<div class="entry" id="api-align">
+  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Align</span><span class="arg"></span></span>
+  <p class="doc-p">How a table column lines up its cells, taken from the delimiter row.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">Default</span></span>
+    <span class="sig"><span class="arg">Left</span></span>
+    <span class="sig"><span class="arg">Center</span></span>
+    <span class="sig"><span class="arg">Right</span></span>
+  </div>
+</div>
+<div class="entry" id="api-block">
+  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Block</span><span class="arg"></span></span>
+  <p class="doc-p">A block level node.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">Heading(Heading)</span></span>
+    <span class="sig"><span class="arg">Paragraph(Array[Inline])</span></span>
+    <span class="sig"><span class="arg">Code(Code)</span></span>
+    <span class="sig"><span class="arg">Quote(Array[Block])</span></span>
+    <span class="sig"><span class="arg">List(ListBlock)</span></span>
+    <span class="sig"><span class="arg">Table(Table)</span></span>
+    <span class="sig"><span class="arg">Html(String)</span></span>
+    <span class="sig"><span class="arg">Break</span></span>
+  </div>
+</div>
+<div class="entry" id="api-break">
+  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Break</span><span class="arg"></span></span>
+  <p class="doc-p">A line break inside a paragraph.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">Soft</span></span>
+    <span class="sig"><span class="arg">Hard</span></span>
+  </div>
+</div>
+<div class="entry" id="api-code">
+  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Code</span><span class="arg"></span></span>
+  <p class="doc-p">A code block, fenced or indented. <code>info</code> is the word after the opening fence, empty for indented code.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">info : String</span></span>
+    <span class="sig"><span class="arg">text : String</span></span>
+    <span class="sig"><span class="arg">fenced : Bool</span></span>
+  </div>
+</div>
+<div class="entry" id="api-document">
+  <span class="sig"><span class="kw">pub struct</span> <span class="name">Document</span><span class="arg"></span></span>
+  <p class="doc-p">A parsed document: the blocks in order, and the flavor it was read with, which the HTML renderer needs for the tag filter.</p>
+  <div class="members">
+    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::blocks</span><span class="arg">(Self) -&gt; Array[Block]</span></span>
+    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::flavor</span><span class="arg">(Self) -&gt; Flavor</span></span>
+    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::html</span><span class="arg">(Self, safe? : Bool) -&gt; String</span></span>
+    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::markdown</span><span class="arg">(Self) -&gt; String</span></span>
+    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::of_blocks</span><span class="arg">(Array[Block], flavor? : Flavor) -&gt; Self</span></span>
+  </div>
+</div>
+<div class="entry" id="api-flavor">
+  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Flavor</span><span class="arg"></span></span>
+  <p class="doc-p">What a parser accepts beyond the CommonMark core. The presets <code>commonmark</code> and <code>gfm</code> cover the two dialects this library is asked for; the fields are public so a caller can take one and drop what it does not want.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">tables : Bool</span></span>
+    <span class="sig"><span class="arg">strikethrough : Bool</span></span>
+    <span class="sig"><span class="arg">autolinks : Bool</span></span>
+    <span class="sig"><span class="arg">task_lists : Bool</span></span>
+    <span class="sig"><span class="arg">tag_filter : Bool</span></span>
+  </div>
+</div>
+<div class="entry" id="api-heading">
+  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Heading</span><span class="arg"></span></span>
+  <p class="doc-p">A heading, <code>level</code> counting the ATX <code>#</code> marks or the setext underline.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">level : Int32</span></span>
+    <span class="sig"><span class="arg">content : Array[Inline]</span></span>
+  </div>
+</div>
+<div class="entry" id="api-inline">
+  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Inline</span><span class="arg"></span></span>
+  <p class="doc-p">An inline level node.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">Text(String)</span></span>
+    <span class="sig"><span class="arg">Code(String)</span></span>
+    <span class="sig"><span class="arg">Emphasis(Array[Inline])</span></span>
+    <span class="sig"><span class="arg">Strong(Array[Inline])</span></span>
+    <span class="sig"><span class="arg">Link(Link)</span></span>
+    <span class="sig"><span class="arg">Image(Link)</span></span>
+    <span class="sig"><span class="arg">Html(String)</span></span>
+    <span class="sig"><span class="arg">Strike(Array[Inline])</span></span>
+    <span class="sig"><span class="arg">Break(Break)</span></span>
+  </div>
+</div>
+<div class="entry" id="api-item">
+  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Item</span><span class="arg"></span></span>
+  <p class="doc-p">One item of a list, with the task marker that introduced it if any.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">blocks : Array[Block]</span></span>
+    <span class="sig"><span class="arg">task : Task</span></span>
+  </div>
+</div>
+<div class="entry" id="api-link">
+  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Link</span><span class="arg"></span></span>
+  <p class="doc-p">The destination, title and content of a link or image. For an image the content is the alternative text.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">dest : String</span></span>
+    <span class="sig"><span class="arg">title : String</span></span>
+    <span class="sig"><span class="arg">content : Array[Inline]</span></span>
+  </div>
+</div>
+<div class="entry" id="api-listblock">
+  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">ListBlock</span><span class="arg"></span></span>
+  <p class="doc-p">A list, with its items and whether it is tight (no blank lines between items, so their paragraphs are rendered without <code>&lt;p&gt;</code>).</p>
+  <div class="members">
+    <span class="sig"><span class="arg">kind : ListKind</span></span>
+    <span class="sig"><span class="arg">tight : Bool</span></span>
+    <span class="sig"><span class="arg">items : Array[Item]</span></span>
+  </div>
+</div>
+<div class="entry" id="api-listkind">
+  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">ListKind</span><span class="arg"></span></span>
+  <p class="doc-p">What kind of list a <code>ListBlock</code> is, together with the marks needed to write it back unchanged.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">Bullet(Char)</span></span>
+    <span class="sig"><span class="arg">Ordered(Int32, Char)</span></span>
+  </div>
+</div>
+<div class="entry" id="api-node">
+  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Node</span><span class="arg"></span></span>
+  <p class="doc-p">A node as <code>walk</code> hands it to its visitor: either a block or an inline.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">Block(Block)</span></span>
+    <span class="sig"><span class="arg">Inline(Inline)</span></span>
+  </div>
+</div>
+<div class="entry" id="api-stream">
+  <span class="sig"><span class="kw">pub struct</span> <span class="name">Stream</span><span class="arg"></span></span>
+  <p class="doc-p">A parser that reads a document in pieces. Text that has arrived is parsed again on every call, but only the part that has not been handed out yet, so the work per chunk is proportional to the unfinished tail rather than to the whole document.</p>
+  <div class="members">
+    <span class="sig"><span class="kw">pub fn</span> <span class="name">Stream::feed</span><span class="arg">(Self, StringView) -&gt; Array[Block]</span></span>
+    <span class="sig"><span class="kw">pub fn</span> <span class="name">Stream::finish</span><span class="arg">(Self) -&gt; Array[Block]</span></span>
+    <span class="sig"><span class="kw">pub fn</span> <span class="name">Stream::new</span><span class="arg">(flavor? : Flavor, defer_links? : Bool) -&gt; Self</span></span>
+  </div>
+</div>
+<div class="entry" id="api-table">
+  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Table</span><span class="arg"></span></span>
+  <p class="doc-p">A table: the alignment of each column, the header row, then the body rows. A row holds one cell per column, and a cell holds the inlines inside it.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">align : Array[Align]</span></span>
+    <span class="sig"><span class="arg">head : Array[Array[Inline]]</span></span>
+    <span class="sig"><span class="arg">body : Array[Array[Array[Inline]]]</span></span>
+  </div>
+</div>
+<div class="entry" id="api-task">
+  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Task</span><span class="arg"></span></span>
+  <p class="doc-p">Whether a list item is a task list item, and if so whether it is done.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">Plain</span></span>
+    <span class="sig"><span class="arg">Unchecked</span></span>
+    <span class="sig"><span class="arg">Checked</span></span>
+  </div>
+</div>
+</div>
+        <!-- api:end -->
+      </section>
+
+      <footer class="foot">
+        <div class="foot-inner">
+          <span>moonmd</span>
+          <a href="https://github.com/moonbitstack/moonmd/blob/master/LICENSE">Apache-2.0</a>
+          <a href="index.html">overview</a>
+          <a href="https://github.com/moonbitstack/moonmd">GitHub</a>
+          <span class="tail">CommonMark 0.31.2</span>
+        </div>
+      </footer>
+    </div>
+  </div>
+</main>
+
+<script src="assets/site.js"></script>
+</body>
+</html>

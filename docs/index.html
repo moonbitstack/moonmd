@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>moonmd — Markdown, read into a tree</title>
+<meta name="description" content="CommonMark 0.31.2 and GitHub Flavored Markdown for MoonBit: parse into a tree, render HTML or Markdown, and read text incrementally as it is written.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script>
+(function () {
+  try {
+    var saved = localStorage.getItem("moonmd-theme");
+    if (saved === "ink" || saved === "paper") document.documentElement.setAttribute("data-theme", saved);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="wordmark" href="index.html"><i class="mark"></i>moonmd <span>markdown</span></a>
+    <nav class="nav" aria-label="This site">
+      <a href="index.html" aria-current="page">overview</a>
+      <a href="guide.html">guide</a>
+      <a href="guide.html#api">api</a>
+      <a class="icon-link" href="https://github.com/moonbitstack/moonmd" aria-label="moonmd on GitHub">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-switch" type="button" aria-pressed="false" aria-label="Switch between paper and ink">
+        <span class="track" aria-hidden="true"><span class="knob"></span></span><span class="label">paper</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="sheet">
+  <div class="doc">
+    <div class="margin" aria-hidden="true">
+      <div class="spine"></div>
+      <ul class="mark-list">
+        <li data-for="top">§01</li>
+        <li data-for="workbench">§02</li>
+        <li data-for="works">§03</li>
+        <li data-for="figures">§04</li>
+        <li data-for="onward">§05</li>
+      </ul>
+    </div>
+
+    <div class="body-col">
+
+      <section id="top" class="section">
+        <p class="kicker">a Markdown reader</p>
+        <h1>Markdown, read into a <em>tree</em>.</h1>
+        <p class="lede">CommonMark 0.31.2 and GitHub Flavored Markdown for MoonBit. A document
+          becomes blocks and inlines you can walk, renders as HTML or as Markdown again,
+          and can be read a chunk at a time while it is still being written.</p>
+        <div class="install">
+          <code class="cmd" id="install-cmd"><b>moon</b> add moonbitstack/moonmd</code>
+          <button class="btn" type="button" data-copy="install-cmd">copy</button>
+          <a class="btn solid" href="guide.html">read the guide</a>
+        </div>
+        <p class="spec-marks" aria-label="What it covers">
+          <span>CommonMark 0.31.2</span>
+          <span>tables, strikethrough, autolinks, task lists, tag filter</span>
+          <span>native, js, wasm, wasm-gc</span>
+        </p>
+      </section>
+
+      <section id="workbench" class="section" aria-labelledby="workbench-title">
+        <p class="kicker">the workbench</p>
+        <h2 id="workbench-title">Set a page.</h2>
+        <p class="lede">Everything below is this library compiled to JavaScript: the same parser,
+          the same renderer, no second implementation. Type in the left column; the right one
+          follows.</p>
+
+        <div class="galley">
+          <div class="galley-bar">
+            <button class="tab" type="button" data-mode="html" aria-selected="true">html</button>
+            <button class="tab" type="button" data-mode="tree" aria-selected="false">tree</button>
+            <button class="tab" type="button" data-mode="markdown" aria-selected="false">markdown</button>
+            <span class="spacer"></span>
+            <select id="flavor" aria-label="Markdown flavor">
+              <option value="gfm" selected>gfm</option>
+              <option value="commonmark">commonmark</option>
+            </select>
+          </div>
+          <div class="galley-body">
+            <div class="pane">
+              <div class="pane-head"><span>source</span><span>editable</span></div>
+              <textarea id="source" spellcheck="false" aria-label="Markdown source" autocapitalize="off" autocorrect="off"></textarea>
+            </div>
+            <div class="pane">
+              <div class="pane-head"><span>output</span><span class="live-tag">settling</span></div>
+              <div id="out" class="out scroll"></div>
+            </div>
+          </div>
+          <div class="galley-foot">
+            <span class="stats" id="stats">loading the engine</span>
+            <div class="samples">
+              <button class="chip" type="button" data-sample="notes" aria-pressed="true">notes</button>
+              <button class="chip" type="button" data-sample="table" aria-pressed="false">table</button>
+              <button class="chip" type="button" data-sample="edges" aria-pressed="false">edges</button>
+              <button class="chip" type="button" data-sample="stream" aria-pressed="false">stream</button>
+              <button class="chip" type="button" id="play">as a stream</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="works" class="section" aria-labelledby="works-title">
+        <p class="kicker">what it does</p>
+        <h2 id="works-title">Four calls, one tree.</h2>
+        <div class="plates">
+          <article class="plate">
+            <p class="kicker">01 · read</p>
+            <h3>Blocks first, then inlines</h3>
+            <p>A line opens a container or closes one; what is left over is read for emphasis,
+              links, code spans and entities. The pairing rules are the ones in the
+              specification, not an approximation of them.</p>
+            <div class="glyph" aria-hidden="true"><span class="rule"></span><span class="mark">#</span></div>
+          </article>
+          <article class="plate">
+            <p class="kicker">02 · write</p>
+            <h3>HTML, safe by default</h3>
+            <p>Raw HTML is escaped and a destination that would run script keeps its text and
+              loses its link. Pass <span class="mono">safe=false</span> to reproduce the
+              specification's output byte for byte.</p>
+            <div class="glyph" aria-hidden="true"><span class="rule"></span><span class="mark">&lt;/&gt;</span></div>
+          </article>
+          <article class="plate">
+            <p class="kicker">03 · return</p>
+            <h3>Back out as Markdown</h3>
+            <p>The same tree writes itself out as Markdown that reads back to the same HTML:
+              fences grow to clear their contents, text that would start a block is escaped.</p>
+            <div class="glyph" aria-hidden="true"><span class="rule"></span><span class="mark">¶</span></div>
+          </article>
+          <article class="plate">
+            <p class="kicker">04 · stream</p>
+            <h3>Read while it is written</h3>
+            <p><span class="mono">feed</span> returns the blocks no later text can change,
+              <span class="mono">finish</span> the rest. A chunk may end anywhere, including in
+              the middle of a line.</p>
+            <div class="glyph" aria-hidden="true"><span class="rule"></span><span class="mark">»</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="figures" class="section" aria-labelledby="figures-title">
+        <p class="kicker">the figures</p>
+        <!-- numbers:begin -->
+        <div class="numbers">
+          <div><b>652</b><span>specification examples</span></div>
+          <div><b>29</b><span>extension examples</span></div>
+          <div><b>0.31.2</b><span>CommonMark version</span></div>
+          <div><b>5</b><span>extensions in gfm</span></div>
+        </div>
+        <!-- numbers:end -->
+        <p class="note" style="margin-top:14px">Counted from the example sets the package carries, not typed by hand.</p>
+      </section>
+
+      <section id="onward" class="section" aria-labelledby="onward-title">
+        <p class="kicker">read on</p>
+        <h2 id="onward-title">Two pages, the whole library.</h2>
+        <div class="next">
+          <a href="guide.html">
+            <span class="k">guide</span>
+            <span class="t">From install to a stream</span>
+            <span class="d">Every call, with the output it really prints.</span>
+          </a>
+          <a href="guide.html#api">
+            <span class="k">api</span>
+            <span class="t">Reference</span>
+            <span class="d">Every public type and function, generated from the package.</span>
+          </a>
+          <a href="https://github.com/moonbitstack/moonmd">
+            <span class="k">source</span>
+            <span class="t">GitHub</span>
+            <span class="d">The implementation, the corpora and the tests.</span>
+          </a>
+          <a href="https://mooncakes.io/docs/moonbitstack/moonmd">
+            <span class="k">package</span>
+            <span class="t">Mooncakes</span>
+            <span class="d">Version, dependencies and the published interface.</span>
+          </a>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <div class="foot-inner">
+          <span>moonmd</span>
+          <a href="https://github.com/moonbitstack/moonmd/blob/master/LICENSE">Apache-2.0</a>
+          <a href="guide.html">guide</a>
+          <a href="guide.html#api">api</a>
+          <a href="https://github.com/moonbitstack/moonmd">GitHub</a>
+          <span class="tail">CommonMark 0.31.2</span>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+</main>
+
+<script src="assets/site.js"></script>
+<script src="assets/workbench.js"></script>
+</body>
+</html>
