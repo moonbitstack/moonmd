@@ -1,0 +1,15 @@
+// The site's engine: this library built to JavaScript, so the page parses with
+// the same code the package ships. Strings in, JSON out.
+
+import {
+  "moonbitstack/moonmd" @md,
+}
+
+options(
+  link: {
+    "js": {
+      "exports": [ "html", "markdown", "tree", "stream" ],
+      "format": "esm",
+    },
+  },
+)

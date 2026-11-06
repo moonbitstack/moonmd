@@ -1,0 +1,19 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moonmd/engine"
+
+// Values
+pub fn html(String, String, Bool) -> String
+
+pub fn markdown(String, String) -> String
+
+pub fn stream(String, String, Int32) -> String
+
+pub fn tree(String, String) -> String
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

@@ -3,3 +3,6 @@
 !.moonignore
 _*
 target/
+
+# the site engine, built by the docs workflow
+docs/engine/
