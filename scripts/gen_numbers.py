@@ -40,7 +40,7 @@ def figures() -> list[tuple[str, str]]:
     return [
         (f"{spec}", "specification examples"),
         (f"{extensions - ignored}", "extension examples"),
-        ("0.31.2", "CommonMark version"),
+        ("0.31.2", "commonmark version"),
         (f"{boxes}", "extensions in gfm"),
     ]
 
