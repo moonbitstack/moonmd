@@ -59,7 +59,7 @@ test "CommonMark 0.31.2 specification" {
 /// The extension corpus has three examples that use footnotes. Footnotes are
 /// not part of the tree this library hands out, so they are not expected to
 /// pass; README.md lists them in its conformance section.
-fn is_footnote_example(example : Int) -> Bool {
+fn is_footnote_example(example : Int32) -> Bool {
   example == 23 || example == 24 || example == 25
 }
 
@@ -84,11 +84,17 @@ test "GitHub Flavored Markdown extensions" {
   // wrong and this list is out of date.
   let mut differing = 0
   for case in footnotes {
-    let got = @moonmd.parse(case.markdown[:], flavor=@moonmd.gfm).html(safe=false)
+    let got = @moonmd.parse(case.markdown[:], flavor=@moonmd.gfm).html(
+      safe=false,
+    )
     if got != case.html {
       differing = differing + 1
     }
   }
-  assert_eq(differing, footnotes.length(), msg="footnote examples that now pass")
+  assert_eq(
+    differing,
+    footnotes.length(),
+    msg="footnote examples that now pass",
+  )
   assert_eq(footnotes.length(), 3, msg="footnote examples in the corpus")
 }
