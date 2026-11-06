@@ -1,0 +1,21 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moonmd/tests/spec"
+
+// Values
+pub fn commonmark_cases() -> Array[Case]
+
+pub fn gfm_cases() -> Array[Case]
+
+// Errors
+
+// Types and methods
+pub(all) struct Case {
+  example : Int32
+  section : String
+  markdown : String
+  html : String
+}
+
+// Type aliases
+
+// Traits
