@@ -233,6 +233,15 @@
     for (var i = 0; i < tabs.length; i++) {
       tabs[i].setAttribute("aria-selected", "false");
     }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      for (var k = 0; k < steps.length; k++) {
+        out.insertAdjacentHTML("beforeend", steps[k].html);
+      }
+      source.value = text;
+      if (liveTag) liveTag.classList.remove("on");
+      setStatus("settled in " + steps.length + " blocks");
+      return;
+    }
     var shown = 0;
     for (var step = 0; step < steps.length; step++) {
       if (token !== run) return;
