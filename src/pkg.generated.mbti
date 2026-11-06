@@ -2,10 +2,127 @@
 package "moonbitstack/moonmd"
 
 // Values
+pub let commonmark : Flavor
+
+pub let flavor : Flavor
+
+pub let gfm : Flavor
+
+pub fn parse(StringView, flavor? : Flavor) -> Document
+
+pub fn walk(Document, (Node) -> Unit) -> Unit
 
 // Errors
 
 // Types and methods
+pub(all) enum Align {
+  Default
+  Left
+  Center
+  Right
+}
+
+pub(all) enum Block {
+  Heading(Heading)
+  Paragraph(Array[Inline])
+  Code(Code)
+  Quote(Array[Block])
+  List(ListBlock)
+  Table(Table)
+  Html(String)
+  Break
+}
+
+pub(all) enum Break {
+  Soft
+  Hard
+}
+
+pub(all) struct Code {
+  info : String
+  text : String
+  fenced : Bool
+}
+
+pub struct Document {
+  // private fields
+}
+pub fn Document::blocks(Self) -> Array[Block]
+pub fn Document::flavor(Self) -> Flavor
+pub fn Document::html(Self, safe? : Bool) -> String
+pub fn Document::markdown(Self) -> String
+pub fn Document::of_blocks(Array[Block], flavor? : Flavor) -> Self
+
+pub(all) struct Flavor {
+  tables : Bool
+  strikethrough : Bool
+  autolinks : Bool
+  task_lists : Bool
+  tag_filter : Bool
+}
+
+pub(all) struct Heading {
+  level : Int32
+  content : Array[Inline]
+}
+
+pub(all) enum Inline {
+  Text(String)
+  Code(String)
+  Emphasis(Array[Inline])
+  Strong(Array[Inline])
+  Link(Link)
+  Image(Link)
+  Html(String)
+  Strike(Array[Inline])
+  Break(Break)
+}
+
+pub(all) struct Item {
+  blocks : Array[Block]
+  task : Task
+}
+
+pub(all) struct Link {
+  dest : String
+  title : String
+  content : Array[Inline]
+}
+
+pub(all) struct ListBlock {
+  kind : ListKind
+  tight : Bool
+  items : Array[Item]
+}
+
+pub(all) enum ListKind {
+  Bullet(Char)
+  Ordered(Int32, Char)
+}
+
+pub(all) enum Node {
+  Block(Block)
+  Inline(Inline)
+}
+
+pub struct Stream {
+  // private fields
+}
+pub fn Stream::feed(Self, StringView) -> Array[Block]
+pub fn Stream::finish(Self) -> Array[Block]
+pub fn Stream::new(flavor? : Flavor, defer_links? : Bool) -> Self
+
+pub(all) struct Table {
+  align : Array[Align]
+  head : Array[Array[Inline]]
+  body : Array[Array[Array[Inline]]]
+}
+
+pub(all) enum Task {
+  Plain
+  Unchecked
+  Checked
+}
 
 // Type aliases
 
