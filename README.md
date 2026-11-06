@@ -27,7 +27,9 @@ moon add moonbitstack/moonmd
 `parse` reads a document once and hands back a `Document`. Nothing is rendered
 until you ask for it, and both renderings come from the same tree.
 
-```moonbit nocheck
+<!-- nocheck -->
+
+```moonbit
 let document = @moonmd.parse("# Title\n\nA *short* paragraph with a [link](/a).\n")
 let html = document.html(safe=false)
 let markdown = document.markdown()
@@ -48,7 +50,9 @@ way it did.
 
 A `Document` holds top level `Block`s in order.
 
-```moonbit nocheck
+<!-- nocheck -->
+
+```moonbit
 pub(all) enum Block {
   Heading(Heading)          // level, content
   Paragraph(Array[Inline])  // a paragraph of inlines
@@ -64,7 +68,9 @@ pub(all) enum Block {
 An inline is one of the following. `Link` carries the destination, the title and
 the content; the content of an image is its alternative text.
 
-```moonbit nocheck
+<!-- nocheck -->
+
+```moonbit
 pub(all) enum Inline {
   Text(String)
   Code(String)
@@ -80,7 +86,9 @@ pub(all) enum Inline {
 
 `walk` visits every node, each container before its children:
 
-```moonbit nocheck
+<!-- nocheck -->
+
+```moonbit
 let counts = [0, 0]
 @moonmd.walk(document, fn(node) {
   match node {
@@ -96,7 +104,9 @@ let counts = [0, 0]
 `Flavor` is a plain record. `gfm` is the default, `commonmark` turns every
 extension off, and any field can be changed on its own.
 
-```moonbit nocheck
+<!-- nocheck -->
+
+```moonbit
 pub(all) struct Flavor {
   tables : Bool          // pipe tables
   strikethrough : Bool   // ~~struck out~~
@@ -106,7 +116,9 @@ pub(all) struct Flavor {
 }
 ```
 
-```moonbit nocheck
+<!-- nocheck -->
+
+```moonbit
 let document = @moonmd.parse(text, flavor=@moonmd.commonmark)
 ```
 
@@ -116,7 +128,9 @@ A model writes a document a token at a time. `Stream::feed` takes whatever has
 arrived and returns the blocks that no later text can change; `finish` returns
 the rest.
 
-```moonbit nocheck
+<!-- nocheck -->
+
+```moonbit
 let stream = @moonmd.Stream::new()
 for chunk in chunks {
   for block in stream.feed(chunk) {
@@ -181,7 +195,9 @@ Two further properties are checked over the same corpora:
 
 ## Interface
 
-```moonbit nocheck
+<!-- nocheck -->
+
+```moonbit
 pub fn parse(text : StringView, flavor~ : Flavor = flavor) -> Document
 pub fn Document::html(Self, safe~ : Bool = true) -> String
 pub fn Document::markdown(Self) -> String
