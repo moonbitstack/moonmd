@@ -60,7 +60,7 @@
 
     <div class="guide-body">
       <p class="kicker">the guide</p>
-      <h1 style="font-size:clamp(2rem,4.4vw,3.2rem)">A document, whole and in pieces.</h1>
+      <h1 class="guide-title">A document, whole and in pieces.</h1>
       <p class="lede">Install the package, read one document, look at what came out, then read
         one that is still arriving. Every output below is what the library printed for the code
         above it.</p>
@@ -424,12 +424,27 @@ println(plain.html(safe=false))</code></pre>
       </section>
 
       <footer class="foot">
-        <div class="foot-inner">
-          <span>moonmd</span>
-          <a href="https://github.com/moonbitstack/moonmd/blob/master/LICENSE">Apache-2.0</a>
-          <a href="index.html">overview</a>
-          <a href="https://github.com/moonbitstack/moonmd">GitHub</a>
-          <span class="tail">CommonMark 0.31.2</span>
+        <div class="foot-grid">
+          <div class="foot-brand">
+            <a class="wordmark" href="index.html"><i class="mark"></i>moonmd</a>
+            <p>Markdown for MoonBit, read into a tree and written back out.</p>
+          </div>
+          <nav class="foot-col" aria-label="Pages">
+            <h5>pages</h5>
+            <a href="index.html">overview</a>
+            <a href="guide.html">guide</a>
+            <a href="guide.html#api">api</a>
+          </nav>
+          <div class="foot-col">
+            <h5>elsewhere</h5>
+            <a href="https://github.com/moonbitstack/moonmd">GitHub</a>
+            <a href="https://mooncakes.io/docs/moonbitstack/moonmd">Mooncakes</a>
+            <a href="https://github.com/moonbitstack/moonmd/blob/master/LICENSE">Apache-2.0</a>
+          </div>
+        </div>
+        <div class="foot-base">
+          <span>CommonMark 0.31.2</span>
+          <span>Set in Newsreader and JetBrains Mono</span>
         </div>
       </footer>
     </div>
