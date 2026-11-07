@@ -305,8 +305,8 @@
       if (out) {
         out.textContent =
           "The parser is built to JavaScript by the docs workflow. Run " +
-          "`moon build --target js --release src/engine` and copy the output to " +
-          "docs/engine/moonmd.js to try it locally.";
+          "`moon build --target js --release src/examples/browser` and copy the " +
+          "output to docs/engine/moonmd.js to try it locally.";
       }
     }
   );

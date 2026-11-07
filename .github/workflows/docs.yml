@@ -46,9 +46,9 @@ jobs:
 
       - name: build the engine the pages parse with
         run: |
-          moon build --target js --release src/engine
+          moon build --target js --release src/examples/browser
           mkdir -p docs/engine
-          cp _build/js/release/build/engine/engine.js docs/engine/moonmd.js
+          cp _build/js/release/build/examples/browser/browser.js docs/engine/moonmd.js
 
       - name: configure pages
         uses: actions/configure-pages@v6

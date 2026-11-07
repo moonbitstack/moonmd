@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbitstack/moonmd/engine"
+package "moonbitstack/moonmd/examples/browser"
 
 // Values
 pub fn html(String, String, Bool) -> String
