@@ -84,6 +84,25 @@ fn collect(chunks : Array[String]) -> Array[@moonmd.Block] {
 }
 ```
 
+## Footnotes
+
+A `[^label]` in the text is a reference; a line opening `[^label]:` is its
+definition. The reference becomes a numbered marker, the definition is moved to
+the end as a `Footnote` block, and `markdown` writes both back.
+
+```moonbit
+fn footnote_labels(markdown : String) -> Array[String] {
+  let labels : Array[String] = []
+  @moonmd.walk(@moonmd.parse(markdown[:]), fn(node) {
+    match node {
+      @moonmd.Block(@moonmd.Footnote(footnote)) => labels.push(footnote.label)
+      _ => ()
+    }
+  })
+  labels
+}
+```
+
 ## Rules that catch people out
 
 - A block that mentions `[` waits for `finish` by default, because a link
@@ -94,6 +113,7 @@ fn collect(chunks : Array[String]) -> Array[@moonmd.Block] {
   default is the mode a page that shows untrusted Markdown wants.
 - The tree is a value: `Document::blocks` and `walk` never hand out something you
   can change. Build a document out of blocks with `Document::of_blocks`.
-- Tables, strikethrough, bare links, task list items and the tag filter are on by
-  default (`Flavor` `gfm`). Pass `flavor=@moonmd.commonmark` for plain CommonMark.
-- Footnotes are not supported: `[^note]` and its definition stay text.
+- Tables, strikethrough, bare links, task list items, footnotes and the tag
+  filter are on by default (`Flavor` `gfm`). Pass `flavor=@moonmd.commonmark`
+  for plain CommonMark.
+- A footnote reference with no definition stays the text it was written as.

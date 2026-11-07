@@ -80,6 +80,33 @@ pub(all) struct Table {
 }
 
 ///|
+/// A footnote, the body of one `[^label]:` definition. `label` is the label as
+/// it was written. `number` is the order the footnote is shown with, assigned in
+/// the order its first reference appears in the text; `backrefs` is how many
+/// references point at it.
+pub(all) struct Footnote {
+  label : String
+  blocks : Array[Block]
+  /// The number the footnote is shown with, or 0 until the document is read.
+  number : Int32
+  /// The references that point at the footnote, in the order they appear.
+  backrefs : Int32
+}
+
+///|
+/// A footnote reference, `[^label]`, and where it lands: the definition's
+/// `label`, the `number` that definition is shown with, and `ref_ix`, the order
+/// of this reference among the ones that point at the definition.
+pub(all) struct FootnoteRef {
+  /// The label of the definition the reference points at, as written.
+  label : String
+  /// The number the definition is shown with.
+  number : Int32
+  /// The order of this reference among the ones pointing at the definition.
+  ref_ix : Int32
+}
+
+///|
 /// A block level node.
 pub(all) enum Block {
   /// A heading of `level` 1 to 6.
@@ -98,6 +125,8 @@ pub(all) enum Block {
   Html(String)
   /// A thematic break, the line of three or more `-`, `*` or `_`.
   Break
+  /// The body of a footnote definition.
+  Footnote(Footnote)
 }
 
 ///|
@@ -139,6 +168,9 @@ pub(all) enum Inline {
   Strike(Array[Inline])
   /// A soft or hard line break.
   Break(Break)
+  /// A footnote reference, `[^label]`, with the number of the definition it
+  /// points at and its order among the references to that definition.
+  FootnoteRef(FootnoteRef)
 }
 
 ///|
@@ -185,7 +217,15 @@ fn walk_block(block : Block, visit : (Node) -> Unit) -> Unit {
         }
       }
     }
+    Footnote(footnote) => walk_blocks(footnote.blocks, visit)
     Code(_) | Html(_) | Break => ()
+  }
+}
+
+///|
+fn walk_blocks(blocks : Array[Block], visit : (Node) -> Unit) -> Unit {
+  for block in blocks {
+    walk_block(block, visit)
   }
 }
 
@@ -197,7 +237,7 @@ fn walk_inlines(inlines : Array[Inline], visit : (Node) -> Unit) -> Unit {
       Emphasis(children) | Strong(children) | Strike(children) =>
         walk_inlines(children, visit)
       Link(link) | Image(link) => walk_inlines(link.content, visit)
-      Text(_) | Code(_) | Html(_) | Break(_) => ()
+      Text(_) | Code(_) | Html(_) | Break(_) | FootnoteRef(_) => ()
     }
   }
 }

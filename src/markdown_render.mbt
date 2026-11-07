@@ -130,7 +130,31 @@ fn write_block(
       out.write_string("***\n")
       context.at_line_start = true
     }
+    Footnote(footnote) => write_footnote(out, footnote, context)
   }
+}
+
+///|
+/// A footnote definition: its label, then its body indented under it. The
+/// indentation is what keeps the body's blocks nested inside the definition
+/// when the document is read again.
+fn write_footnote(
+  out : StringBuilder,
+  footnote : Footnote,
+  context : MarkdownContext,
+) -> Unit {
+  out.write_string("[^")
+  out.write_string(footnote.label)
+  out.write_string("]:\n")
+  let inner = StringBuilder()
+  write_blocks(inner, footnote.blocks, MarkdownContext::new(), true)
+  let body = inner.to_string().trim_end(chars="\n"[:])
+  for line in split_written_lines(body.to_owned()) {
+    out.write_string("    ")
+    out.write_string(line)
+    out.write_char('\n')
+  }
+  context.at_line_start = true
 }
 
 ///|
@@ -499,6 +523,12 @@ fn write_inline(
         out.write_char('"')
       }
       out.write_char(')')
+      context.at_line_start = false
+    }
+    FootnoteRef(fnref) => {
+      out.write_string("[^")
+      out.write_string(fnref.label)
+      out.write_char(']')
       context.at_line_start = false
     }
   }

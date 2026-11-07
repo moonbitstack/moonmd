@@ -8,12 +8,15 @@ pub struct Document {
 
 ///|
 /// Assemble a document out of blocks, which is what a caller collecting the
-/// output of a `Stream` needs in order to render it.
+/// output of a `Stream` needs in order to render it. Footnote references are
+/// resolved against the definitions in the blocks, so a definition read after
+/// the reference that uses it still applies.
 pub fn Document::of_blocks(
   blocks : Array[Block],
   flavor~ : Flavor = flavor,
 ) -> Document {
-  { blocks, flavor, }
+  let settled = settle_footnotes(blocks, flavor)
+  { blocks: settled, flavor, }
 }
 
 ///|

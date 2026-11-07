@@ -44,6 +44,15 @@
       "A row wider than the header is cut to the header's width.",
       ""
     ].join("\n"),
+    footnotes: [
+      "# Citations",
+      "",
+      "A claim that wants a source[^source], and a second one[^source]",
+      "that cites it again.",
+      "",
+      "[^source]: The whole document is the tree.",
+      ""
+    ].join("\n"),
     edges: [
       "A paragraph with *one* and **two** and ~~three~~ marks,",
       "a [link](/url \"title\") and a bare https://example.com.",
@@ -80,7 +89,7 @@
     var inlines = 0;
     var blockNames = [
       "Heading", "Paragraph", "Code", "Quote", "List", "Item", "Table",
-      "Row", "Cell", "Html", "Break"
+      "Row", "Cell", "Html", "Break", "Footnote"
     ];
     var walk = function (item, isRoot) {
       var isBlock = blockNames.indexOf(item.type) !== -1;

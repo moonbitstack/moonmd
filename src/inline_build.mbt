@@ -39,6 +39,8 @@ fn materialize_inlines(tree : InlineTree, parent : Int32) -> Array[Inline] {
             content: materialize_inlines(tree, node),
           }),
         )
+      FootnoteRefNode =>
+        out.push(FootnoteRef({ label: current.text, number: 0, ref_ix: 0, }))
     }
     node = next
   }

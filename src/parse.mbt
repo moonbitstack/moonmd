@@ -18,7 +18,7 @@ pub fn parse(text : StringView, flavor~ : Flavor = flavor) -> Document {
   }
   parser.close_all()
   let blocks = build_blocks(parser.tree, parser.refs, flavor, parser.root, -1)
-  { blocks, flavor, }
+  Document::of_blocks(blocks, flavor~)
 }
 
 ///|

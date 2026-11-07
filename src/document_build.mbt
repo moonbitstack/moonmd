@@ -42,6 +42,17 @@ fn build_blocks(
       Quote => out.push(Quote(build_blocks(tree, refs, flavor, node, -1)))
       List => out.push(List(build_list(tree, refs, flavor, node)))
       Table => out.push(Table(build_table(tree, refs, flavor, node)))
+      FootnoteDefinition => {
+        let label = tree.nodes[node].info
+        out.push(
+          Footnote({
+            label,
+            blocks: build_blocks(tree, refs, flavor, node, -1),
+            number: 0,
+            backrefs: 0,
+          }),
+        )
+      }
       _ => ()
     }
     node = tree.nodes[node].next

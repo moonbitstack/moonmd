@@ -48,12 +48,13 @@
         <li><a href="#tree"><span class="n">03</span>the tree</a></li>
         <li><a href="#html"><span class="n">04</span>html</a></li>
         <li><a href="#markdown"><span class="n">05</span>markdown</a></li>
-        <li><a href="#stream"><span class="n">06</span>streaming</a></li>
-        <li><a href="#flavors"><span class="n">07</span>flavors</a></li>
+        <li><a href="#footnotes"><span class="n">06</span>footnotes</a></li>
+        <li><a href="#stream"><span class="n">07</span>streaming</a></li>
+        <li><a href="#flavors"><span class="n">08</span>flavors</a></li>
       </ul>
       <h4>reference</h4>
       <ul>
-        <li><a href="#api"><span class="n">08</span>api</a></li>
+        <li><a href="#api"><span class="n">09</span>api</a></li>
         <li><a href="https://github.com/moonbitstack/moonmd">source</a></li>
       </ul>
     </aside>
@@ -106,7 +107,7 @@ println(document.html(safe=false))</code></pre>
         <p class="kicker"><span>§03</span></p>
         <h2>The tree</h2>
         <p>Blocks hold blocks; a paragraph, a heading and a table cell hold inlines. There are
-          eight block kinds and nine inline kinds, and <span class="mono">walk</span> visits each
+          nine block kinds and ten inline kinds, and <span class="mono">walk</span> visits each
           node once, containers before their contents.</p>
         <div class="code" data-lang="moonbit">
           <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-walk">copy</button></div>
@@ -178,8 +179,38 @@ A *small* page.</code></pre>
           indented code block becomes a fence. What survives is the document, not its whitespace.</p>
       </section>
 
-      <section id="stream">
+      <section id="footnotes">
         <p class="kicker"><span>§06</span></p>
+        <h2>Footnotes</h2>
+        <p class="intro"><span class="mono">gfm</span> also reads footnotes: a
+          <span class="mono">[^label]</span> in the text is a reference, and a line that opens
+          <span class="mono">[^label]:</span> is its definition. The reference becomes a numbered
+          marker; the definitions gather at the end as a notes list, each with a link back to where
+          it was cited.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-fn">copy</button></div>
+          <pre><code id="c-fn">let document = @moonmd.parse("A claim[^note]\n\n[^note]: the support\n"[:])
+println(document.html(safe=false))</code></pre>
+        </div>
+        <div class="code output" data-lang="html">
+          <div class="code-head"><span>output</span></div>
+          <pre><code>&lt;p&gt;A claim&lt;sup class="footnote-ref"&gt;&lt;a href="#fn-note" id="fnref-note" data-footnote-ref&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;section class="footnotes" data-footnotes&gt;
+&lt;ol&gt;
+&lt;li id="fn-note"&gt;
+&lt;p&gt;the support &lt;a href="#fnref-note" class="footnote-backref" data-footnote-backref data-footnote-backref-idx="1" aria-label="Back to reference 1"&gt;&#x21A9;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;</code></pre>
+        </div>
+        <p>The number follows the first reference, not the definition, so a document can define its
+          notes in any order. <span class="mono">markdown</span> writes both the reference and the
+          definition back out, and a reference with no definition stays the text it was written
+          as.</p>
+      </section>
+
+      <section id="stream">
+        <p class="kicker"><span>§07</span></p>
         <h2>Streaming</h2>
         <p class="intro"><span class="mono">feed</span> takes the next chunk and returns the blocks
           that no later text can change. <span class="mono">finish</span> returns what is left. A
@@ -207,11 +238,11 @@ println(stream.finish().length())</code></pre>
       </section>
 
       <section id="flavors">
-        <p class="kicker"><span>§07</span></p>
+        <p class="kicker"><span>§08</span></p>
         <h2>Flavors</h2>
         <p class="intro"><span class="mono">gfm</span> is the default: CommonMark plus tables,
-          strikethrough, bare links, task list markers and the tag filter.
-          <span class="mono">commonmark</span> turns all five off, and a
+          strikethrough, bare links, task list markers, footnotes and the tag filter.
+          <span class="mono">commonmark</span> turns all six off, and a
           <span class="mono">Flavor</span> literal turns them off one at a time.</p>
         <div class="code" data-lang="moonbit">
           <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-flavor">copy</button></div>
@@ -227,7 +258,7 @@ println(plain.html(safe=false))</code></pre>
       </section>
 
       <section id="api">
-        <p class="kicker"><span>§08</span></p>
+        <p class="kicker"><span>§09</span></p>
         <h2>API reference</h2>
         <p class="intro">Generated from <span class="mono">pkg.generated.mbti</span> and the doc
           comments in the source, so this list is the package's interface, not a copy of it.</p>
@@ -244,7 +275,7 @@ println(plain.html(safe=false))</code></pre>
 </div>
 <div class="entry" id="api-gfm">
   <span class="sig"><span class="kw">pub let</span> <span class="name">gfm</span><span class="arg"> : Flavor</span></span>
-  <p class="doc-p">CommonMark as GitHub reads it: tables, strikethrough, bare links, task list items and the tag filter. This is the default.</p>
+  <p class="doc-p">CommonMark as GitHub reads it: tables, strikethrough, bare links, task list items, the tag filter and footnotes. This is the default.</p>
 </div>
 </div>
 <div class="api-group" id="api-functions">
@@ -286,6 +317,7 @@ println(plain.html(safe=false))</code></pre>
     <span class="sig"><span class="arg">Table(Table)</span></span>
     <span class="sig"><span class="arg">Html(String)</span></span>
     <span class="sig"><span class="arg">Break</span></span>
+    <span class="sig"><span class="arg">Footnote(Footnote)</span></span>
   </div>
 </div>
 <div class="entry" id="api-break">
@@ -325,6 +357,26 @@ println(plain.html(safe=false))</code></pre>
     <span class="sig"><span class="arg">autolinks : Bool</span></span>
     <span class="sig"><span class="arg">task_lists : Bool</span></span>
     <span class="sig"><span class="arg">tag_filter : Bool</span></span>
+    <span class="sig"><span class="arg">footnotes : Bool</span></span>
+  </div>
+</div>
+<div class="entry" id="api-footnote">
+  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Footnote</span><span class="arg"></span></span>
+  <p class="doc-p">A footnote, the body of one <code>[^label]:</code> definition. <code>label</code> is the label as it was written. <code>number</code> is the order the footnote is shown with, assigned in the order its first reference appears in the text; <code>backrefs</code> is how many references point at it.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">label : String</span></span>
+    <span class="sig"><span class="arg">blocks : Array[Block]</span></span>
+    <span class="sig"><span class="arg">number : Int32</span></span>
+    <span class="sig"><span class="arg">backrefs : Int32</span></span>
+  </div>
+</div>
+<div class="entry" id="api-footnoteref">
+  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">FootnoteRef</span><span class="arg"></span></span>
+  <p class="doc-p">A footnote reference, <code>[^label]</code>, and where it lands: the definition's <code>label</code>, the <code>number</code> that definition is shown with, and <code>ref_ix</code>, the order of this reference among the ones that point at the definition.</p>
+  <div class="members">
+    <span class="sig"><span class="arg">label : String</span></span>
+    <span class="sig"><span class="arg">number : Int32</span></span>
+    <span class="sig"><span class="arg">ref_ix : Int32</span></span>
   </div>
 </div>
 <div class="entry" id="api-heading">
@@ -348,6 +400,7 @@ println(plain.html(safe=false))</code></pre>
     <span class="sig"><span class="arg">Html(String)</span></span>
     <span class="sig"><span class="arg">Strike(Array[Inline])</span></span>
     <span class="sig"><span class="arg">Break(Break)</span></span>
+    <span class="sig"><span class="arg">FootnoteRef(FootnoteRef)</span></span>
   </div>
 </div>
 <div class="entry" id="api-item">

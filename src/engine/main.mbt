@@ -147,6 +147,7 @@ fn inline_type(inline : @md.Inline) -> String {
     @md.Image(_) => "Image"
     @md.Html(_) => "Html"
     @md.Break(_) => "Break"
+    @md.FootnoteRef(_) => "FootnoteRef"
   }
 }
 
@@ -180,6 +181,8 @@ fn block_json(block : @md.Block) -> Json {
       }
       node("Table", detail_of_block(block), grid)
     }
+    @md.Footnote(footnote) =>
+      node("Footnote", "\{footnote.label}", footnote.blocks.map(block_json))
     @md.Code(_) => node("Code", detail_of_block(block), [])
     @md.Html(_) => node("Html", detail_of_block(block), [])
     @md.Break => node("Break", "", [])

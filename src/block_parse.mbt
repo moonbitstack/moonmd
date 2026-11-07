@@ -257,6 +257,13 @@ fn BlockParser::check_open_blocks(self : BlockParser) -> (Int32, Bool) {
       Html => if !self.parse_html_block_prefix(container) { stopped = true }
       Paragraph => if self.blank { stopped = true }
       Table => if self.blank { stopped = true }
+      FootnoteDefinition =>
+        if self.indent >= CODE_INDENT {
+          // The body is written under the definition; that much is dropped.
+          self.advance_offset(CODE_INDENT, true)
+        } else if !self.blank {
+          stopped = true
+        }
       _ => ()
     }
   }
@@ -465,6 +472,11 @@ fn BlockParser::open_new_blocks(
     } else {
       0
     }
+    let foot = if !indented && self.flavor.footnotes && depth < MAX_LIST_DEPTH {
+      scan_footnote_definition(text, first)
+    } else {
+      0
+    }
     let marker = if (!indented || cont_type == List) &&
       self.indent < CODE_INDENT &&
       depth < MAX_LIST_DEPTH {
@@ -519,6 +531,18 @@ fn BlockParser::open_new_blocks(
     } else if thematic != 0 {
       container = self.add_child(container, ThematicBreak)
       self.advance_offset(self.line.length() - 1 - self.offset, false)
+    } else if foot != 0 {
+      // The label is what the references look it up by, kept as written: it is
+      // the text between the caret and the bracket that closes it.
+      container = self.add_child(container, FootnoteDefinition)
+      let mut close = first + 2
+      while cu(text, close) != 0x5D {
+        close = close + 1
+      }
+      self.tree.nodes[container].info = text
+        .clamped_view(start=first + 2, end=close)
+        .to_owned()
+      self.advance_offset(first + foot - self.offset, false)
     } else if marker_matched {
       container = self.open_list_item(
         container,

@@ -16,6 +16,7 @@ priv enum InlineKind {
   ImageNode
   SoftBreakNode
   HardBreakNode
+  FootnoteRefNode
 }
 
 ///|
@@ -167,6 +168,9 @@ priv struct Bracket {
   inl : Int32
   prev : Int32
   pos : Int32
+  /// The position right after the `[`, where the bracket's content begins:
+  /// the start of a footnote reference's label.
+  body_start : Int32
   mut bracket_after : Bool
 }
 
@@ -286,6 +290,9 @@ fn Subject::is_special(self : Subject, c : Int32) -> Bool {
   if self.flavor.strikethrough && c == 0x7E {
     return true
   }
+  if self.flavor.footnotes && c == 0x5E {
+    return true
+  }
   false
 }
 
@@ -344,6 +351,7 @@ fn Subject::push_bracket(self : Subject, image : Bool, inl : Int32) -> Unit {
     inl,
     prev: self.last_bracket,
     pos: self.pos,
+    body_start: self.pos,
     bracket_after: false,
   })
   self.last_bracket = self.brackets.length() - 1

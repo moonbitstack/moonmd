@@ -80,7 +80,10 @@ fn Subject::parse_inline(self : Subject) -> Unit {
     0x5D => self.handle_close_bracket()
     0x21 => {
       self.pos = self.pos + 1
-      if self.peek(self.pos) == 0x5B {
+      // A `!` followed by `[^` opens a footnote reference, not an image: the
+      // exclamation mark is then ordinary text.
+      if self.peek(self.pos) == 0x5B &&
+        !(self.flavor.footnotes && self.peek(self.pos + 1) == 0x5E) {
         self.pos = self.pos + 1
         let node = self.add_text("![")
         self.push_bracket(true, node)
@@ -440,6 +443,35 @@ fn Subject::handle_close_bracket(self : Subject) -> Unit {
         }
         None => ()
       }
+    }
+  }
+  if !matched &&
+    self.flavor.footnotes &&
+    !is_image &&
+    self.peek(self.brackets[opener].body_start) == 0x5E {
+    // `[^label]` is a footnote reference: it points at a definition by its
+    // label, which is resolved to a number when the document is rendered. The
+    // label is taken from the source between the caret and the close.
+    self.pos = initial_pos
+    let body_start = self.brackets[opener].body_start
+    let label = self.input
+      .clamped_view(start=body_start + 1, end=initial_pos - 1)
+      .to_owned()
+    if label.length() > 0 {
+      let opener_inl = self.brackets[opener].inl
+      let fnref = self.tree.make(FootnoteRefNode, label, label.length(), "")
+      self.tree.insert_after(opener_inl, fnref)
+      let mut node = self.tree.nodes[fnref].next
+      while node >= 0 {
+        let next = self.tree.nodes[node].next
+        self.tree.detach(node)
+        self.tree.append_child(fnref, node)
+        node = next
+      }
+      self.tree.detach(opener_inl)
+      self.process_emphasis(self.brackets[opener].pos)
+      self.pop_bracket()
+      return
     }
   }
   if !matched {

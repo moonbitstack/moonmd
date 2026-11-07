@@ -17,6 +17,7 @@ priv enum Kind {
   Table
   TableRow
   TableCell
+  FootnoteDefinition
 }
 
 ///|
@@ -146,7 +147,7 @@ fn Tree::make(self : Tree, kind : Kind, line : Int32) -> Int32 {
 /// ends the table.
 fn Tree::can_contain(self : Tree, parent : Int32, child : Kind) -> Bool {
   match self.nodes[parent].kind {
-    Document | Quote | Item => true
+    Document | Quote | Item | FootnoteDefinition => true
     List => child == Item
     Table => child == TableRow
     TableRow => child == TableCell

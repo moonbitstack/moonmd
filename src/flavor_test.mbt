@@ -74,6 +74,7 @@ test "a flavor can be taken apart field by field" {
     autolinks: false,
     task_lists: false,
     tag_filter: false,
+    footnotes: false,
   }
   assert_eq(
     @moonmd.parse("~~gone~~"[:], flavor=only_tables).html(safe=false),

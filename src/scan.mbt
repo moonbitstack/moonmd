@@ -215,6 +215,44 @@ fn scan_thematic_break(text : StringView, start : Int32) -> Int32 {
 }
 
 ///|
+/// The opening of a footnote definition, `[^label]:`: a caret, a label that
+/// holds nothing but a `]`, a space, a tab or a line ending, a colon, and the
+/// run of spaces or tabs the reference tolerates after it. Returns the number of
+/// code units the opening spans, or zero.
+fn scan_footnote_definition(text : StringView, start : Int32) -> Int32 {
+  if cu(text, start) != 0x5B {
+    return 0
+  }
+  if cu(text, start + 1) != 0x5E {
+    return 0
+  }
+  let n = text.length()
+  let mut i = start + 2
+  let mut saw = false
+  while i < n {
+    let c = cu(text, i)
+    if c == 0x5D {
+      if saw && cu(text, i + 1) == 0x3A {
+        // The spaces and tabs after the colon belong to the marker, so the
+        // body begins at the first character that is not one of them.
+        i = i + 2
+        while cu(text, i) == 0x20 || cu(text, i) == 0x09 {
+          i = i + 1
+        }
+        return i - start
+      }
+      return 0
+    }
+    if c == 0x20 || c == 0x09 || c == 0x0A || c == 0x0D {
+      return 0
+    }
+    saw = true
+    i = i + 1
+  }
+  0
+}
+
+///|
 /// The names the CommonMark specification lists as block level HTML tags.
 let html_block_tags : Array[String] = [
   "address", "article", "aside", "base", "basefont", "blockquote", "body", "caption",

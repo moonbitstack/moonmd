@@ -70,3 +70,8 @@ jobs:
             [ -f "$dir/SKILL.md" ] || continue
             pipx run --spec skills-ref agentskills validate "$dir"
           done
+
+      - name: the code in the docs compiles
+        if: runner.os == 'Linux'
+        run: |
+          python scripts/check_snippets.py

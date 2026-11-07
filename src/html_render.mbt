@@ -16,8 +16,44 @@ let filtered_tags : Array[String] = [
 /// `safe=false` to write a document that may embed HTML of its own.
 pub fn Document::html(self : Document, safe~ : Bool = true) -> String {
   let out = HtmlOut::new()
-  render_blocks(out, self.blocks, self.flavor, !safe, false)
+  let permit_html = !safe
+  let blocks = self.blocks
+  // The footnotes, if there are any, were gathered to the end of the document
+  // and are the last blocks; they are written inside the notes section.
+  let footnotes_start = find_footnotes_start(blocks)
+  render_blocks(
+    out,
+    blocks.clamped_view(start=0, end=footnotes_start),
+    self.flavor,
+    permit_html,
+    false,
+  )
+  if footnotes_start < blocks.length() {
+    out.put_string("<section class=\"footnotes\" data-footnotes>\n<ol>\n")
+    render_blocks(
+      out,
+      blocks.clamped_view(start=footnotes_start, end=blocks.length()),
+      self.flavor,
+      permit_html,
+      false,
+    )
+    out.put_string("</ol>\n</section>\n")
+  }
   out.buf.to_string()
+}
+
+///|
+/// The first of the trailing footnote blocks, or the end of the array when
+/// there are none.
+fn find_footnotes_start(blocks : Array[Block]) -> Int32 {
+  let mut i = blocks.length() - 1
+  while i >= 0 {
+    match blocks[i] {
+      Footnote(_) => i = i - 1
+      _ => break
+    }
+  }
+  i + 1
 }
 
 ///|
@@ -130,7 +166,7 @@ fn filtered_html(out : HtmlOut, text : StringView, flavor : Flavor) -> Unit {
 ///|
 fn render_blocks(
   out : HtmlOut,
-  blocks : Array[Block],
+  blocks : ArrayView[Block],
   flavor : Flavor,
   permit_html : Bool,
   tight : Bool,
@@ -214,6 +250,86 @@ fn render_block(
       out.cr()
       out.put_string("<hr />\n")
     }
+    Footnote(footnote) => render_footnote(out, footnote, flavor, permit_html)
+  }
+}
+
+///|
+/// One footnote: a list item whose last line carries the link back to the
+/// reference it is reached from, and one more for every further reference to
+/// the same footnote.
+fn render_footnote(
+  out : HtmlOut,
+  footnote : Footnote,
+  flavor : Flavor,
+  permit_html : Bool,
+) -> Unit {
+  out.put_string("<li id=\"fn-")
+  write_href_escaped(out.buf, footnote.label[:])
+  out.put_string("\">\n")
+  let blocks = footnote.blocks
+  let mut backref_written = false
+  let mut i = 0
+  for block in blocks {
+    let is_last = i == blocks.length() - 1
+    if is_last {
+      match block {
+        // The backref goes inside the last paragraph, the way a paragraph at
+        // the end of a footnote reads.
+        Paragraph(content) => {
+          out.cr()
+          out.put_string("<p>")
+          render_inlines(out, content, flavor, permit_html, false, false)
+          out.put_char(' ')
+          write_footnote_backref(out, footnote)
+          out.put_string("</p>\n")
+          backref_written = true
+        }
+        _ => render_block(out, block, flavor, permit_html, false)
+      }
+    } else {
+      render_block(out, block, flavor, permit_html, false)
+    }
+    i = i + 1
+  }
+  if !backref_written {
+    // The body does not end in a paragraph, so the backref stands alone.
+    write_footnote_backref(out, footnote)
+    out.put_char('\n')
+  }
+  out.put_string("</li>\n")
+}
+
+///|
+/// The links back to the references a footnote is reached from.
+fn write_footnote_backref(out : HtmlOut, footnote : Footnote) -> Unit {
+  out.put_string("<a href=\"#fnref-")
+  write_href_escaped(out.buf, footnote.label[:])
+  out.put_string(
+    "\" class=\"footnote-backref\" data-footnote-backref data-footnote-backref-idx=\"",
+  )
+  out.put_string(footnote.number.to_string())
+  out.put_string("\" aria-label=\"Back to reference ")
+  out.put_string(footnote.number.to_string())
+  out.put_string("\">↩</a>")
+  for i = 2; i <= footnote.backrefs; i = i + 1 {
+    out.put_string(" <a href=\"#fnref-")
+    write_href_escaped(out.buf, footnote.label[:])
+    out.put_string("-")
+    out.put_string(i.to_string())
+    out.put_string(
+      "\" class=\"footnote-backref\" data-footnote-backref data-footnote-backref-idx=\"",
+    )
+    out.put_string(footnote.number.to_string())
+    out.put_string("-")
+    out.put_string(i.to_string())
+    out.put_string("\" aria-label=\"Back to reference ")
+    out.put_string(footnote.number.to_string())
+    out.put_string("-")
+    out.put_string(i.to_string())
+    out.put_string("\">↩<sup class=\"footnote-ref\">")
+    out.put_string(i.to_string())
+    out.put_string("</sup></a>")
   }
 }
 
@@ -479,5 +595,21 @@ fn render_inline(
         out.put_string("\" />")
       }
     }
+    FootnoteRef(fnref) =>
+      if plain {
+        out.escaped(fnref.label[:])
+      } else {
+        out.put_string("<sup class=\"footnote-ref\"><a href=\"#fn-")
+        write_href_escaped(out.buf, fnref.label[:])
+        out.put_string("\" id=\"fnref-")
+        write_href_escaped(out.buf, fnref.label[:])
+        if fnref.ref_ix > 1 {
+          out.put_char('-')
+          out.put_string(fnref.ref_ix.to_string())
+        }
+        out.put_string("\" data-footnote-ref>")
+        out.put_string(fnref.number.to_string())
+        out.put_string("</a></sup>")
+      }
   }
 }

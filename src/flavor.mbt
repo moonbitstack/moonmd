@@ -13,6 +13,8 @@ pub(all) struct Flavor {
   task_lists : Bool
   /// Escape the raw HTML tags that would change the meaning of the page.
   tag_filter : Bool
+  /// `[^label]` references with their `[^label]:` definitions.
+  footnotes : Bool
 }
 
 ///|
@@ -23,17 +25,19 @@ pub let commonmark : Flavor = {
   autolinks: false,
   task_lists: false,
   tag_filter: false,
+  footnotes: false,
 }
 
 ///|
 /// CommonMark as GitHub reads it: tables, strikethrough, bare links, task list
-/// items and the tag filter. This is the default.
+/// items, the tag filter and footnotes. This is the default.
 pub let gfm : Flavor = {
   tables: true,
   strikethrough: true,
   autolinks: true,
   task_lists: true,
   tag_filter: true,
+  footnotes: true,
 }
 
 ///|

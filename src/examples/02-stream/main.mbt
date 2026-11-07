@@ -33,5 +33,6 @@ fn describe(block : @moonmd.Block) -> String {
     @moonmd.Table(_) => "a table"
     @moonmd.Html(_) => "raw HTML"
     @moonmd.Break => "a thematic break"
+    @moonmd.Footnote(_) => "a footnote"
   }
 }

@@ -31,6 +31,7 @@ pub(all) enum Block {
   Table(Table)
   Html(String)
   Break
+  Footnote(Footnote)
 }
 
 pub(all) enum Break {
@@ -59,6 +60,20 @@ pub(all) struct Flavor {
   autolinks : Bool
   task_lists : Bool
   tag_filter : Bool
+  footnotes : Bool
+}
+
+pub(all) struct Footnote {
+  label : String
+  blocks : Array[Block]
+  number : Int32
+  backrefs : Int32
+}
+
+pub(all) struct FootnoteRef {
+  label : String
+  number : Int32
+  ref_ix : Int32
 }
 
 pub(all) struct Heading {
@@ -76,6 +91,7 @@ pub(all) enum Inline {
   Html(String)
   Strike(Array[Inline])
   Break(Break)
+  FootnoteRef(FootnoteRef)
 }
 
 pub(all) struct Item {
