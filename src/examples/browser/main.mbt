@@ -115,11 +115,28 @@ fn detail_of_inline(inline : @md.Inline) -> String {
 }
 
 ///|
-fn node(name : String, detail : String, children : Array[Json]) -> Json {
-  {
-    "type": Json::string(name),
-    "detail": Json::string(detail),
-    "children": Json::array(children),
+/// One node of the tree. `lines` is only given to the blocks at the top of the
+/// document, because those are the ones the page can point a reader at.
+fn node(
+  name : String,
+  detail : String,
+  children : Array[Json],
+  lines? : Array[Json],
+) -> Json {
+  match lines {
+    Some(lines) =>
+      {
+        "type": Json::string(name),
+        "detail": Json::string(detail),
+        "children": Json::array(children),
+        "lines": Json::array(lines),
+      }
+    None =>
+      {
+        "type": Json::string(name),
+        "detail": Json::string(detail),
+        "children": Json::array(children),
+      }
   }
 }
 
@@ -152,12 +169,19 @@ fn inline_type(inline : @md.Inline) -> String {
 }
 
 ///|
-fn block_json(block : @md.Block) -> Json {
+fn block_json(block : @md.Block, lines? : Array[Json]) -> Json {
   match block {
     @md.Heading(heading) =>
-      node("Heading", detail_of_block(block), heading.content.map(inline_json))
-    @md.Paragraph(inlines) => node("Paragraph", "", inlines.map(inline_json))
-    @md.Quote(blocks) => node("Quote", "", blocks.map(block_json))
+      node(
+        "Heading",
+        detail_of_block(block),
+        heading.content.map(inline_json),
+        lines?,
+      )
+    @md.Paragraph(inlines) =>
+      node("Paragraph", "", inlines.map(inline_json), lines?)
+    @md.Quote(blocks) =>
+      node("Quote", "", blocks.map(fn(child) { block_json(child) }), lines?)
     @md.List(list) => {
       let items = list.items.map(fn(item) {
         let task = match item.task {
@@ -165,7 +189,7 @@ fn block_json(block : @md.Block) -> Json {
           @md.Unchecked => "unchecked"
           @md.Plain => ""
         }
-        node("Item", task, item.blocks.map(block_json))
+        node("Item", task, item.blocks.map(fn(child) { block_json(child) }))
       })
       node("List", detail_of_block(block), items)
     }
@@ -182,20 +206,52 @@ fn block_json(block : @md.Block) -> Json {
       node("Table", detail_of_block(block), grid)
     }
     @md.Footnote(footnote) =>
-      node("Footnote", "\{footnote.label}", footnote.blocks.map(block_json))
-    @md.Code(_) => node("Code", detail_of_block(block), [])
-    @md.Html(_) => node("Html", detail_of_block(block), [])
-    @md.Break => node("Break", "", [])
+      node(
+        "Footnote",
+        "\{footnote.label}",
+        footnote.blocks.map(fn(child) { block_json(child) }),
+        lines?,
+      )
+    @md.Code(_) => node("Code", detail_of_block(block), [], lines?)
+    @md.Html(_) => node("Html", detail_of_block(block), [], lines?)
+    @md.Break => node("Break", "", [], lines?)
   }
 }
 
 ///|
 /// The tree of the document, as JSON: one node per block and one per inline,
-/// each with the one line of context that matters for it.
+/// each with the one line of context that matters for it. The blocks at the
+/// top of the document also carry the lines they were read from.
 pub fn tree(source : String, flavor : String) -> String {
   let document = @md.parse(source[:], flavor=flavor_of(flavor))
-  let blocks = document.blocks().map(block_json)
+  let spans = document.lines()
+  let blocks : Array[Json] = []
+  for i, block in document.blocks() {
+    if i < spans.length() {
+      let span = spans[i]
+      blocks.push(
+        block_json(block, lines=[
+          Json::number(span.first.to_double()),
+          Json::number(span.last.to_double()),
+        ]),
+      )
+    } else {
+      blocks.push(block_json(block))
+    }
+  }
   node("Document", "", blocks).stringify()
+}
+
+///|
+/// One block of the document, rendered on its own, so the page can show what
+/// the block the reader picked turns into.
+pub fn block(source : String, flavor : String, index : Int32) -> String {
+  let chosen = flavor_of(flavor)
+  let blocks = @md.parse(source[:], flavor=chosen).blocks()
+  if index < 0 || index >= blocks.length() {
+    return ""
+  }
+  @md.Document::of_blocks([blocks[index]], flavor=chosen).html(safe=false)
 }
 
 ///|

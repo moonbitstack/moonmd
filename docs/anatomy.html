@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>anatomy — moonmd</title>
+<meta name="description" content="A document opened: its source, the tree it is read into, what each block renders to, and when a stream hands it out. Parsed in the browser by moonmd itself.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script>
+(function () {
+  try {
+    var nav = performance.getEntriesByType ? performance.getEntriesByType("navigation") : [];
+    var kind = nav.length ? nav[0].type : "";
+    if (!kind && performance.navigation) kind = performance.navigation.type === 1 ? "reload" : "navigate";
+    if (kind === "reload") {
+      sessionStorage.removeItem("moonmd-theme");
+      return;
+    }
+    var saved = sessionStorage.getItem("moonmd-theme");
+    if (saved === "ink" || saved === "paper") document.documentElement.setAttribute("data-theme", saved);
+  } catch (e) {}
+})();
+</script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="wordmark" href="index.html"><i class="mark"></i>moonmd <span>markdown</span></a>
+    <nav class="nav" aria-label="This site">
+      <a href="index.html">overview</a>
+      <a href="guide.html">guide</a>
+      <a href="api.html">api</a>
+      <a href="anatomy.html" aria-current="page">anatomy</a>
+      <a class="icon-link" href="https://github.com/moonbitstack/moonmd" aria-label="moonmd on GitHub">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-switch" type="button" aria-pressed="false" aria-label="Switch between paper and ink">
+        <span class="track" aria-hidden="true"><span class="knob"></span></span><span class="label">paper</span>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<main class="sheet">
+  <div class="anatomy">
+
+    <section class="anatomy-head">
+      <p class="kicker">the anatomy</p>
+      <h1 class="guide-title">A document, <em>opened</em>.</h1>
+      <p class="lede">Every panel on this page is this library compiled to JavaScript: the source
+        on the left, the tree it is read into on the right, and what each block becomes. Pick a
+        line, or a node, and the rest follows.</p>
+      <div class="specimens" role="group" aria-label="Specimens">
+        <button class="chip" type="button" data-specimen="prose" aria-pressed="true">prose</button>
+        <button class="chip" type="button" data-specimen="list" aria-pressed="false">list</button>
+        <button class="chip" type="button" data-specimen="table" aria-pressed="false">table</button>
+        <button class="chip" type="button" data-specimen="notes" aria-pressed="false">notes</button>
+        <button class="chip" type="button" data-specimen="edges" aria-pressed="false">edges</button>
+      </div>
+    </section>
+
+    <section class="anatomy-grid" aria-label="Source and tree">
+      <div class="sheet-panel">
+        <div class="panel-head"><span>source</span><span id="source-note">five blocks</span></div>
+        <ol id="source" class="lines scroll"></ol>
+      </div>
+      <div class="sheet-panel">
+        <div class="panel-head"><span>tree</span><span id="tree-note"></span></div>
+        <div id="tree" class="tree scroll"></div>
+      </div>
+    </section>
+
+    <section class="out-panel" aria-label="The block, rendered">
+      <div class="panel-head">
+        <span id="out-label">the whole document</span>
+        <span class="hint" id="out-note">as html</span>
+      </div>
+      <pre id="out" class="out scroll"></pre>
+    </section>
+
+    <section class="anatomy-section" aria-labelledby="extensions-title">
+      <p class="kicker"><span>§02</span></p>
+      <h2 id="extensions-title">What the extensions add.</h2>
+      <p class="lede">The same block, read twice: once as GitHub reads it, once as plain
+        CommonMark. The difference is the whole point of a flavor.</p>
+      <div class="pair">
+        <div class="sheet-panel">
+          <div class="panel-head"><span>gfm</span><span>default</span></div>
+          <pre id="as-gfm" class="out scroll"></pre>
+        </div>
+        <div class="sheet-panel">
+          <div class="panel-head"><span>commonmark</span><span>no extensions</span></div>
+          <pre id="as-commonmark" class="out scroll"></pre>
+        </div>
+      </div>
+      <p class="note" id="flavor-note"></p>
+    </section>
+
+    <section class="anatomy-section" aria-labelledby="settle-title">
+      <p class="kicker"><span>§03</span></p>
+      <h2 id="settle-title">When each block settles.</h2>
+      <p class="lede">A model writes a document a token at a time. A block settles once no later
+        text can change it, which is when a following line has closed it. Drag the ruler: the
+        source fills in, and the blocks it has settled are written below.</p>
+      <div class="ruler-wrap">
+        <div class="ruler" id="ruler" aria-hidden="true"></div>
+        <input id="scrub" class="scrub" type="range" min="0" max="0" value="0" step="1" aria-label="How much of the document has arrived">
+      </div>
+      <div class="settle-meta">
+        <span id="settle-note">nothing arrived yet</span>
+        <span id="settle-count"></span>
+      </div>
+      <div id="settled" class="out rendered scroll"></div>
+    </section>
+
+    <footer class="foot">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <a class="wordmark" href="index.html"><i class="mark"></i>moonmd</a>
+          <p>markdown for moonbit, read into a tree and written back out.</p>
+        </div>
+        <nav class="foot-col" aria-label="Pages">
+          <h5>pages</h5>
+          <a href="index.html">overview</a>
+          <a href="guide.html">guide</a>
+          <a href="api.html">api</a>
+          <a href="anatomy.html">anatomy</a>
+        </nav>
+        <div class="foot-col">
+          <h5>elsewhere</h5>
+          <a href="https://github.com/moonbitstack/moonmd">github</a>
+          <a href="https://mooncakes.io/docs/moonbitstack/moonmd">mooncakes</a>
+          <a href="https://github.com/moonbitstack/moonmd/blob/master/LICENSE">apache-2.0</a>
+        </div>
+      </div>
+      <div class="foot-base">
+        <span>commonmark 0.31.2</span>
+        <span>set in newsreader and jetbrains mono</span>
+      </div>
+    </footer>
+
+  </div>
+</main>
+
+<script src="assets/site.js"></script>
+<script src="assets/anatomy.js"></script>
+</body>
+</html>
