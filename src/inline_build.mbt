@@ -3,7 +3,11 @@
 ///|
 /// The inlines inside `parent`, in order. Empty text nodes are dropped: they
 //  only exist while delimiters are being paired up.
-fn materialize_inlines(tree : InlineTree, parent : Int32) -> Array[Inline] {
+fn materialize_inlines(
+  tree : InlineTree,
+  parent : Int32,
+  flavor : Flavor,
+) -> Array[Inline] {
   let out : Array[Inline] = []
   let mut node = tree.nodes[parent].first_child
   while node >= 0 {
@@ -18,17 +22,17 @@ fn materialize_inlines(tree : InlineTree, parent : Int32) -> Array[Inline] {
       }
       CodeNode => out.push(Code(current.text))
       HtmlNode => out.push(Html(current.text))
-      SoftBreakNode => out.push(Break(Soft))
+      SoftBreakNode => out.push(Break(if flavor.breaks { Hard } else { Soft }))
       HardBreakNode => out.push(Break(Hard))
-      EmphNode => out.push(Emphasis(materialize_inlines(tree, node)))
-      StrongNode => out.push(Strong(materialize_inlines(tree, node)))
-      StrikeNode => out.push(Strike(materialize_inlines(tree, node)))
+      EmphNode => out.push(Emphasis(materialize_inlines(tree, node, flavor)))
+      StrongNode => out.push(Strong(materialize_inlines(tree, node, flavor)))
+      StrikeNode => out.push(Strike(materialize_inlines(tree, node, flavor)))
       LinkNode =>
         out.push(
           Link({
             dest: current.text,
             title: current.title,
-            content: materialize_inlines(tree, node),
+            content: materialize_inlines(tree, node, flavor),
           }),
         )
       ImageNode =>
@@ -36,7 +40,7 @@ fn materialize_inlines(tree : InlineTree, parent : Int32) -> Array[Inline] {
           Image({
             dest: current.text,
             title: current.title,
-            content: materialize_inlines(tree, node),
+            content: materialize_inlines(tree, node, flavor),
           }),
         )
       FootnoteRefNode =>

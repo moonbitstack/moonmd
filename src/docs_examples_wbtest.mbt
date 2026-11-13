@@ -90,3 +90,12 @@ test "the guide types the text of a smart flavor" {
     "<p>\u{201C}quoted\u{201D} \u{2013} and\u{2026}</p>\n",
   )
 }
+
+///|
+test "the readme reads a newline as a break" {
+  let boxed : Flavor = { ..gfm, breaks: true, }
+  assert_eq(
+    parse("one\ntwo\n"[:], flavor=boxed).html(safe=false),
+    "<p>one<br />\ntwo</p>\n",
+  )
+}

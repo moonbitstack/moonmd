@@ -23,7 +23,7 @@ fn parse_inlines(
   if flavor.autolinks {
     subject.postprocess_emails(subject.root)
   }
-  materialize_inlines(subject.tree, subject.root)
+  materialize_inlines(subject.tree, subject.root, flavor)
 }
 
 ///|

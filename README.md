@@ -161,6 +161,20 @@ test {
 }
 ```
 
+`breaks` is the other one, and it is also off: a line ending inside a paragraph
+is a hard break, the way a message box reads it, instead of the soft break the
+specification gives it.
+
+```moonbit
+test {
+  let boxed : @moonmd.Flavor = { ..@moonmd.gfm, breaks: true }
+  assert_eq(
+    @moonmd.parse("one\ntwo\n"[:], flavor=boxed).html(safe=false),
+    "<p>one<br />\ntwo</p>\n",
+  )
+}
+```
+
 ## Streaming
 
 A model writes a document a token at a time. `Stream::feed` takes whatever has

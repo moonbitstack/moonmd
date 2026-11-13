@@ -11,6 +11,7 @@ let typed : @moonmd.Flavor = {
   tag_filter: true,
   footnotes: true,
   smart: true,
+  breaks: false,
 }
 
 ///|

@@ -19,6 +19,9 @@ pub(all) struct Flavor {
   /// `---` and `--` become an em and an en dash, and `...` becomes an ellipsis.
   /// Code spans, raw HTML and destinations are left as written.
   smart : Bool
+  /// A line ending inside a paragraph is a hard break, the way a message box
+  /// reads it, rather than the soft break the specification gives it.
+  breaks : Bool
 }
 
 ///|
@@ -31,6 +34,7 @@ pub let commonmark : Flavor = {
   tag_filter: false,
   footnotes: false,
   smart: false,
+  breaks: false,
 }
 
 ///|
@@ -44,6 +48,7 @@ pub let gfm : Flavor = {
   tag_filter: true,
   footnotes: true,
   smart: false,
+  breaks: false,
 }
 
 ///|

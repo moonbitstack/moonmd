@@ -63,6 +63,7 @@ pub(all) struct Flavor {
   tag_filter : Bool
   footnotes : Bool
   smart : Bool
+  breaks : Bool
 }
 
 pub(all) struct Footnote {
