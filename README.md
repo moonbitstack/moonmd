@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://moonbitstack.github.io/moonmd/"><b>Site</b></a> ·
   <a href="https://moonbitstack.github.io/moonmd/guide.html">Guide</a> ·
-  <a href="https://moonbitstack.github.io/moonmd/guide.html#api">API</a> ·
+  <a href="https://moonbitstack.github.io/moonmd/api.html">API</a> ·
   <a href="https://mooncakes.io/docs/moonbitstack/moonmd">Mooncakes</a>
 </p>
 
@@ -56,7 +56,7 @@ way it did.
 
 A `Document` holds top level `Block`s in order. There are nine block kinds and
 ten inline kinds; each of the types and their fields is listed in the
-[API reference](https://moonbitstack.github.io/moonmd/guide.html#api).
+[API reference](https://moonbitstack.github.io/moonmd/api.html).
 `walk` visits every node, each container before its children:
 
 ```moonbit

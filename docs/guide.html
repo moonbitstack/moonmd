@@ -13,7 +13,14 @@
 <script>
 (function () {
   try {
-    var saved = localStorage.getItem("moonmd-theme");
+    var nav = performance.getEntriesByType ? performance.getEntriesByType("navigation") : [];
+    var kind = nav.length ? nav[0].type : "";
+    if (!kind && performance.navigation) kind = performance.navigation.type === 1 ? "reload" : "navigate";
+    if (kind === "reload") {
+      sessionStorage.removeItem("moonmd-theme");
+      return;
+    }
+    var saved = sessionStorage.getItem("moonmd-theme");
     if (saved === "ink" || saved === "paper") document.documentElement.setAttribute("data-theme", saved);
   } catch (e) {}
 })();
@@ -27,7 +34,8 @@
     <nav class="nav" aria-label="This site">
       <a href="index.html">overview</a>
       <a href="guide.html" aria-current="page">guide</a>
-      <a href="guide.html#api">api</a>
+      <a href="api.html">api</a>
+      <a href="anatomy.html">anatomy</a>
       <a class="icon-link" href="https://github.com/moonbitstack/moonmd" aria-label="moonmd on GitHub">
         <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
       </a>
@@ -54,7 +62,7 @@
       </ul>
       <h4>reference</h4>
       <ul>
-        <li><a href="#api"><span class="n">09</span>api</a></li>
+        <li><a href="api.html"><span class="n">09</span>api reference</a></li>
         <li><a href="https://github.com/moonbitstack/moonmd">source</a></li>
       </ul>
     </aside>
@@ -257,224 +265,7 @@ println(plain.html(safe=false))</code></pre>
           clear one field without copying the rest by hand.</p>
       </section>
 
-      <section id="api">
-        <p class="kicker"><span>§09</span></p>
-        <h2>API reference</h2>
-        <p class="intro">Generated from <span class="mono">pkg.generated.mbti</span> and the doc
-          comments in the source, so this list is the package's interface, not a copy of it.</p>
-        <!-- api:begin -->
-<div class="api-group" id="api-values">
-  <h3>values</h3>
-<div class="entry" id="api-commonmark">
-  <span class="sig"><span class="kw">pub let</span> <span class="name">commonmark</span><span class="arg"> : Flavor</span></span>
-  <p class="doc-p">CommonMark without any of the extensions.</p>
-</div>
-<div class="entry" id="api-flavor">
-  <span class="sig"><span class="kw">pub let</span> <span class="name">flavor</span><span class="arg"> : Flavor</span></span>
-  <p class="doc-p">The preset <code>parse</code> uses when the caller does not pass one: <code>gfm</code>.</p>
-</div>
-<div class="entry" id="api-gfm">
-  <span class="sig"><span class="kw">pub let</span> <span class="name">gfm</span><span class="arg"> : Flavor</span></span>
-  <p class="doc-p">CommonMark as GitHub reads it: tables, strikethrough, bare links, task list items, the tag filter and footnotes. This is the default.</p>
-</div>
-</div>
-<div class="api-group" id="api-functions">
-  <h3>functions</h3>
-<div class="entry" id="api-parse">
-  <span class="sig"><span class="kw">pub fn</span> <span class="name">parse</span><span class="arg">(StringView, flavor? : Flavor) -&gt; Document</span></span>
-  <p class="doc-p">Parse a Markdown document.</p>
-  <pre class="doc-code"><code>test {
-    let document = @moonmd.parse("# Title")
-    assert_eq(document.html(safe=false), "&lt;h1&gt;Title&lt;/h1&gt;\n")
-  }</code></pre>
-</div>
-<div class="entry" id="api-walk">
-  <span class="sig"><span class="kw">pub fn</span> <span class="name">walk</span><span class="arg">(Document, (Node) -&gt; Unit) -&gt; Unit</span></span>
-  <p class="doc-p">Visit every node of the document, each container before its children and siblings in order.</p>
-</div>
-</div>
-<div class="api-group" id="api-types">
-  <h3>types</h3>
-<div class="entry" id="api-align">
-  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Align</span><span class="arg"></span></span>
-  <p class="doc-p">How a table column lines up its cells, taken from the delimiter row.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">Default</span></span>
-    <span class="sig"><span class="arg">Left</span></span>
-    <span class="sig"><span class="arg">Center</span></span>
-    <span class="sig"><span class="arg">Right</span></span>
-  </div>
-</div>
-<div class="entry" id="api-block">
-  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Block</span><span class="arg"></span></span>
-  <p class="doc-p">A block level node.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">Heading(Heading)</span></span>
-    <span class="sig"><span class="arg">Paragraph(Array[Inline])</span></span>
-    <span class="sig"><span class="arg">Code(Code)</span></span>
-    <span class="sig"><span class="arg">Quote(Array[Block])</span></span>
-    <span class="sig"><span class="arg">List(ListBlock)</span></span>
-    <span class="sig"><span class="arg">Table(Table)</span></span>
-    <span class="sig"><span class="arg">Html(String)</span></span>
-    <span class="sig"><span class="arg">Break</span></span>
-    <span class="sig"><span class="arg">Footnote(Footnote)</span></span>
-  </div>
-</div>
-<div class="entry" id="api-break">
-  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Break</span><span class="arg"></span></span>
-  <p class="doc-p">A line break inside a paragraph.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">Soft</span></span>
-    <span class="sig"><span class="arg">Hard</span></span>
-  </div>
-</div>
-<div class="entry" id="api-code">
-  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Code</span><span class="arg"></span></span>
-  <p class="doc-p">A code block, fenced or indented. <code>info</code> is the word after the opening fence, empty for indented code.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">info : String</span></span>
-    <span class="sig"><span class="arg">text : String</span></span>
-    <span class="sig"><span class="arg">fenced : Bool</span></span>
-  </div>
-</div>
-<div class="entry" id="api-document">
-  <span class="sig"><span class="kw">pub struct</span> <span class="name">Document</span><span class="arg"></span></span>
-  <p class="doc-p">A parsed document: the blocks in order, and the flavor it was read with, which the HTML renderer needs for the tag filter.</p>
-  <div class="members">
-    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::blocks</span><span class="arg">(Self) -&gt; Array[Block]</span></span>
-    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::flavor</span><span class="arg">(Self) -&gt; Flavor</span></span>
-    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::html</span><span class="arg">(Self, safe? : Bool) -&gt; String</span></span>
-    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::markdown</span><span class="arg">(Self) -&gt; String</span></span>
-    <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::of_blocks</span><span class="arg">(Array[Block], flavor? : Flavor) -&gt; Self</span></span>
-  </div>
-</div>
-<div class="entry" id="api-flavor">
-  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Flavor</span><span class="arg"></span></span>
-  <p class="doc-p">What a parser accepts beyond the CommonMark core. The presets <code>commonmark</code> and <code>gfm</code> cover the two dialects this library is asked for; the fields are public so a caller can take one and drop what it does not want.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">tables : Bool</span></span>
-    <span class="sig"><span class="arg">strikethrough : Bool</span></span>
-    <span class="sig"><span class="arg">autolinks : Bool</span></span>
-    <span class="sig"><span class="arg">task_lists : Bool</span></span>
-    <span class="sig"><span class="arg">tag_filter : Bool</span></span>
-    <span class="sig"><span class="arg">footnotes : Bool</span></span>
-  </div>
-</div>
-<div class="entry" id="api-footnote">
-  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Footnote</span><span class="arg"></span></span>
-  <p class="doc-p">A footnote, the body of one <code>[^label]:</code> definition. <code>label</code> is the label as it was written. <code>number</code> is the order the footnote is shown with, assigned in the order its first reference appears in the text; <code>backrefs</code> is how many references point at it.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">label : String</span></span>
-    <span class="sig"><span class="arg">blocks : Array[Block]</span></span>
-    <span class="sig"><span class="arg">number : Int32</span></span>
-    <span class="sig"><span class="arg">backrefs : Int32</span></span>
-  </div>
-</div>
-<div class="entry" id="api-footnoteref">
-  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">FootnoteRef</span><span class="arg"></span></span>
-  <p class="doc-p">A footnote reference, <code>[^label]</code>, and where it lands: the definition's <code>label</code>, the <code>number</code> that definition is shown with, and <code>ref_ix</code>, the order of this reference among the ones that point at the definition.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">label : String</span></span>
-    <span class="sig"><span class="arg">number : Int32</span></span>
-    <span class="sig"><span class="arg">ref_ix : Int32</span></span>
-  </div>
-</div>
-<div class="entry" id="api-heading">
-  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Heading</span><span class="arg"></span></span>
-  <p class="doc-p">A heading, <code>level</code> counting the ATX <code>#</code> marks or the setext underline.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">level : Int32</span></span>
-    <span class="sig"><span class="arg">content : Array[Inline]</span></span>
-  </div>
-</div>
-<div class="entry" id="api-inline">
-  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Inline</span><span class="arg"></span></span>
-  <p class="doc-p">An inline level node.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">Text(String)</span></span>
-    <span class="sig"><span class="arg">Code(String)</span></span>
-    <span class="sig"><span class="arg">Emphasis(Array[Inline])</span></span>
-    <span class="sig"><span class="arg">Strong(Array[Inline])</span></span>
-    <span class="sig"><span class="arg">Link(Link)</span></span>
-    <span class="sig"><span class="arg">Image(Link)</span></span>
-    <span class="sig"><span class="arg">Html(String)</span></span>
-    <span class="sig"><span class="arg">Strike(Array[Inline])</span></span>
-    <span class="sig"><span class="arg">Break(Break)</span></span>
-    <span class="sig"><span class="arg">FootnoteRef(FootnoteRef)</span></span>
-  </div>
-</div>
-<div class="entry" id="api-item">
-  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Item</span><span class="arg"></span></span>
-  <p class="doc-p">One item of a list, with the task marker that introduced it if any.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">blocks : Array[Block]</span></span>
-    <span class="sig"><span class="arg">task : Task</span></span>
-  </div>
-</div>
-<div class="entry" id="api-link">
-  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Link</span><span class="arg"></span></span>
-  <p class="doc-p">The destination, title and content of a link or image. For an image the content is the alternative text.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">dest : String</span></span>
-    <span class="sig"><span class="arg">title : String</span></span>
-    <span class="sig"><span class="arg">content : Array[Inline]</span></span>
-  </div>
-</div>
-<div class="entry" id="api-listblock">
-  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">ListBlock</span><span class="arg"></span></span>
-  <p class="doc-p">A list, with its items and whether it is tight (no blank lines between items, so their paragraphs are rendered without <code>&lt;p&gt;</code>).</p>
-  <div class="members">
-    <span class="sig"><span class="arg">kind : ListKind</span></span>
-    <span class="sig"><span class="arg">tight : Bool</span></span>
-    <span class="sig"><span class="arg">items : Array[Item]</span></span>
-  </div>
-</div>
-<div class="entry" id="api-listkind">
-  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">ListKind</span><span class="arg"></span></span>
-  <p class="doc-p">What kind of list a <code>ListBlock</code> is, together with the marks needed to write it back unchanged.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">Bullet(Char)</span></span>
-    <span class="sig"><span class="arg">Ordered(Int32, Char)</span></span>
-  </div>
-</div>
-<div class="entry" id="api-node">
-  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Node</span><span class="arg"></span></span>
-  <p class="doc-p">A node as <code>walk</code> hands it to its visitor: either a block or an inline.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">Block(Block)</span></span>
-    <span class="sig"><span class="arg">Inline(Inline)</span></span>
-  </div>
-</div>
-<div class="entry" id="api-stream">
-  <span class="sig"><span class="kw">pub struct</span> <span class="name">Stream</span><span class="arg"></span></span>
-  <p class="doc-p">A parser that reads a document in pieces. Text that has arrived is parsed again on every call, but only the part that has not been handed out yet, so the work per chunk is proportional to the unfinished tail rather than to the whole document.</p>
-  <div class="members">
-    <span class="sig"><span class="kw">pub fn</span> <span class="name">Stream::feed</span><span class="arg">(Self, StringView) -&gt; Array[Block]</span></span>
-    <span class="sig"><span class="kw">pub fn</span> <span class="name">Stream::finish</span><span class="arg">(Self) -&gt; Array[Block]</span></span>
-    <span class="sig"><span class="kw">pub fn</span> <span class="name">Stream::new</span><span class="arg">(flavor? : Flavor, defer_links? : Bool) -&gt; Self</span></span>
-  </div>
-</div>
-<div class="entry" id="api-table">
-  <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Table</span><span class="arg"></span></span>
-  <p class="doc-p">A table: the alignment of each column, the header row, then the body rows. A row holds one cell per column, and a cell holds the inlines inside it.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">align : Array[Align]</span></span>
-    <span class="sig"><span class="arg">head : Array[Array[Inline]]</span></span>
-    <span class="sig"><span class="arg">body : Array[Array[Array[Inline]]]</span></span>
-  </div>
-</div>
-<div class="entry" id="api-task">
-  <span class="sig"><span class="kw">pub(all) enum</span> <span class="name">Task</span><span class="arg"></span></span>
-  <p class="doc-p">Whether a list item is a task list item, and if so whether it is done.</p>
-  <div class="members">
-    <span class="sig"><span class="arg">Plain</span></span>
-    <span class="sig"><span class="arg">Unchecked</span></span>
-    <span class="sig"><span class="arg">Checked</span></span>
-  </div>
-</div>
-</div>
-        <!-- api:end -->
-      </section>
+      >
 
       <footer class="foot">
         <div class="foot-grid">
@@ -486,7 +277,8 @@ println(plain.html(safe=false))</code></pre>
             <h5>pages</h5>
             <a href="index.html">overview</a>
             <a href="guide.html">guide</a>
-            <a href="guide.html#api">api</a>
+            <a href="api.html">api</a>
+            <a href="anatomy.html">anatomy</a>
           </nav>
           <div class="foot-col">
             <h5>elsewhere</h5>

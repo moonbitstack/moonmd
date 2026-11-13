@@ -31,7 +31,7 @@
       var next = currentTheme() === "ink" ? "paper" : "ink";
       root.setAttribute("data-theme", next);
       try {
-        localStorage.setItem("moonmd-theme", next);
+        sessionStorage.setItem("moonmd-theme", next);
       } catch (e) {
         /* a browser with storage off still gets the theme for this visit */
       }
@@ -209,6 +209,41 @@
     if (!code) continue;
     var lang = blocks[b].getAttribute("data-lang");
     code.innerHTML = window.moonmdColor(lang, code.textContent);
+  }
+
+
+  /* ---------- the reference filter ---------- */
+
+  var filter = document.getElementById("api-filter");
+  if (filter) {
+    var entries = document.querySelectorAll(".entry[data-name]");
+    var links = document.querySelectorAll("#api-index a");
+    var groups = document.querySelectorAll(".api-body section");
+
+    var apply = function () {
+      var query = filter.value.trim().toLowerCase();
+      for (var i = 0; i < entries.length; i++) {
+        var name = entries[i].getAttribute("data-name");
+        entries[i].classList.toggle("hidden", Boolean(query) && name.indexOf(query) === -1);
+      }
+      for (var j = 0; j < links.length; j++) {
+        var target = document.getElementById(links[j].getAttribute("href").slice(1));
+        var hidden = target ? target.classList.contains("hidden") : false;
+        links[j].parentNode.classList.toggle("hidden", hidden);
+      }
+      for (var k = 0; k < groups.length; k++) {
+        var shown = groups[k].querySelectorAll(".entry:not(.hidden)").length;
+        groups[k].classList.toggle("hidden", shown === 0);
+      }
+    };
+
+    filter.addEventListener("input", apply);
+    filter.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        filter.value = "";
+        apply();
+      }
+    });
   }
 
   /* ---------- copy ---------- */

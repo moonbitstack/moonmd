@@ -1338,6 +1338,92 @@ h3 {
   color: var(--ink-3);
 }
 
+/* ---------- the reference page ---------- */
+
+.api-body {
+  max-width: 840px;
+}
+
+.filter-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+  user-select: none;
+}
+
+.filter {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 6px 8px;
+  margin-bottom: 18px;
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
+  color: var(--ink);
+}
+
+.filter::placeholder {
+  color: var(--ink-3);
+}
+
+.filter:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.rail a .count {
+  float: right;
+  color: var(--ink-3);
+}
+
+.rail li.hidden,
+.entry.hidden {
+  display: none;
+}
+
+.api-count {
+  margin-top: 18px;
+}
+
+.api-body .entry {
+  padding: 20px 0 22px;
+}
+
+.api-body .entry .doc-p {
+  max-width: 52em;
+}
+
+.member {
+  padding: 9px 0 11px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.member:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.member .sig {
+  font-size: 12px;
+}
+
+.member .doc-p {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  max-width: 50em;
+}
+
+.member .doc-code {
+  margin-top: 8px;
+}
+
+.generic {
+  color: var(--ink-3);
+}
+
 /* ---------- footer ---------- */
 
 .foot {
