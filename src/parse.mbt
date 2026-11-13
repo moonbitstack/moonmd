@@ -17,8 +17,9 @@ pub fn parse(text : StringView, flavor~ : Flavor = flavor) -> Document {
     parser.process_line(line)
   }
   parser.close_all()
+  let lines = top_level_lines(parser.tree)
   let blocks = build_blocks(parser.tree, parser.refs, flavor, parser.root, -1)
-  Document::of_blocks(blocks, flavor~)
+  Document::from_source(blocks, flavor, lines)
 }
 
 ///|

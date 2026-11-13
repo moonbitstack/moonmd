@@ -51,6 +51,7 @@ pub struct Document {
 pub fn Document::blocks(Self) -> Array[Block]
 pub fn Document::flavor(Self) -> Flavor
 pub fn Document::html(Self, safe? : Bool) -> String
+pub fn Document::lines(Self) -> Array[LineSpan]
 pub fn Document::markdown(Self) -> String
 pub fn Document::of_blocks(Array[Block], flavor? : Flavor) -> Self
 
@@ -97,6 +98,11 @@ pub(all) enum Inline {
 pub(all) struct Item {
   blocks : Array[Block]
   task : Task
+}
+
+pub(all) struct LineSpan {
+  first : Int32
+  last : Int32
 }
 
 pub(all) struct Link {

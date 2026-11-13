@@ -44,6 +44,9 @@ priv struct TreeNode {
   mut settled : Bool
   content : StringBuilder
   start_line : Int32
+  /// The last line that carried content anywhere in this block, which is where
+  /// the block ends once trailing blank lines are left out.
+  mut last_line : Int32
   mut level : Int32
   mut setext : Bool
   mut fenced : Bool
@@ -85,6 +88,7 @@ fn Tree::new() -> Tree {
     settled: false,
     content: StringBuilder(),
     start_line: 0,
+    last_line: 0,
     level: 0,
     setext: false,
     fenced: false,
@@ -119,6 +123,7 @@ fn Tree::make(self : Tree, kind : Kind, line : Int32) -> Int32 {
     settled: false,
     content: StringBuilder(),
     start_line: line,
+    last_line: line,
     level: 0,
     setext: false,
     fenced: false,

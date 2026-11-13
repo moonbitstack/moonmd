@@ -4,6 +4,7 @@
 pub struct Document {
   priv blocks : Array[Block]
   priv flavor : Flavor
+  priv lines : Array[LineSpan]
 }
 
 ///|
@@ -16,13 +17,49 @@ pub fn Document::of_blocks(
   flavor~ : Flavor = flavor,
 ) -> Document {
   let settled = settle_footnotes(blocks, flavor)
-  { blocks: settled, flavor, }
+  { blocks: settled, flavor, lines: [], }
+}
+
+///|
+/// The same, for a document that was read from text: the lines each block came
+/// from are carried along, and moved with the blocks that reading footnotes
+/// rearranges.
+fn Document::from_source(
+  blocks : Array[Block],
+  flavor : Flavor,
+  lines : Array[LineSpan],
+) -> Document {
+  let settled = settle_footnotes(blocks, flavor)
+  let aligned = if flavor.footnotes && settled.length() != blocks.length() {
+    realign_lines(blocks, settled, lines)
+  } else {
+    lines
+  }
+  { blocks: settled, flavor, lines: aligned, }
 }
 
 ///|
 /// The top level blocks of the document, in order.
 pub fn Document::blocks(self : Document) -> Array[Block] {
   self.blocks
+}
+
+///|
+/// The lines of the source each top level block was read from, counted from
+/// one, one entry per block of `blocks()` and in the same order. Blank lines
+/// between blocks belong to neither. A document assembled with `of_blocks` was
+/// not read from text, so its list is empty.
+///
+/// ```mbt check
+/// test {
+///   let document = @moonmd.parse("# One\n\ntwo\n")
+///   let spans = document.lines()
+///   assert_eq((spans[0].first, spans[0].last), (1, 1))
+///   assert_eq((spans[1].first, spans[1].last), (3, 3))
+/// }
+/// ```
+pub fn Document::lines(self : Document) -> Array[LineSpan] {
+  self.lines
 }
 
 ///|

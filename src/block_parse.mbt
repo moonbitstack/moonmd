@@ -212,6 +212,7 @@ fn BlockParser::parse_code_block_prefix(
   }
   if matched >= node.fence_length {
     self.advance_offset(matched, false)
+    self.tree.nodes[index].last_line = self.line_number - 1
     self.current = self.finalize(index)
     return (false, false)
   }
@@ -819,6 +820,7 @@ fn BlockParser::add_text_to_container(
     self.add_line(container)
     let html_type = self.tree.nodes[container].html_type
     if scan_html_block_end(self.line[:], self.first_nonspace, html_type) {
+      self.tree.nodes[container].last_line = self.line_number - 1
       container = self.finalize(container)
     }
   } else if self.blank {
@@ -883,6 +885,24 @@ fn BlockParser::process_line(self : BlockParser, line : String) -> Unit {
   }
   let container = self.open_new_blocks(last_matched, all_matched)
   self.add_text_to_container(container, last_matched)
+  self.mark_line_end()
+}
+
+///|
+/// Note on every block this line belongs to that the line reached it. A blank
+/// line inside a code block or a raw HTML block is part of it; anywhere else a
+/// blank line only ends the block, so the last line with something on it is
+/// where the block stopped.
+fn BlockParser::mark_line_end(self : BlockParser) -> Unit {
+  let kind = self.tree.nodes[self.current].kind
+  if is_blank(self.line[:]) && kind != Code && kind != Html {
+    return
+  }
+  let mut node = self.current
+  while node >= 0 {
+    self.tree.nodes[node].last_line = self.line_number - 1
+    node = self.tree.nodes[node].parent
+  }
 }
 
 ///|
