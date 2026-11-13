@@ -30,7 +30,9 @@ fn Document::from_source(
   lines : Array[LineSpan],
 ) -> Document {
   let settled = settle_footnotes(blocks, flavor)
-  let aligned = if flavor.footnotes && settled.length() != blocks.length() {
+  // Reading footnotes moves definitions to the end and drops the ones nothing
+  // refers to, so the lines have to be put back in step with the blocks.
+  let aligned = if flavor.footnotes {
     realign_lines(blocks, settled, lines)
   } else {
     lines

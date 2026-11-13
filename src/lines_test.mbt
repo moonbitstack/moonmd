@@ -50,6 +50,19 @@ test "the notes a footnote is written on stay with its block" {
 }
 
 ///|
+test "a definition written first still points at its own line" {
+  let document = @moonmd.parse("[^n]: body\n\nclaim[^n]\n\nafter\n")
+  assert_eq(spans(document), [(3, 3), (5, 5), (1, 1)])
+}
+
+///|
+test "a definition nothing refers to leaves no line behind" {
+  let document = @moonmd.parse("[^n]: body\n\nafter\n")
+  assert_eq(spans(document), [(3, 3)])
+  assert_eq(document.blocks().length(), 1)
+}
+
+///|
 test "a document with no blocks has no lines" {
   let document = @moonmd.parse("\n\n")
   assert_eq(document.lines().length(), 0)
