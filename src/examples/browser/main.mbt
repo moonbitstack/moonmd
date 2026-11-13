@@ -5,6 +5,7 @@
 fn flavor_of(name : String) -> @md.Flavor {
   match name {
     "commonmark" => @md.commonmark
+    "smart" => { ..@md.gfm, smart: true, }
     _ => @md.gfm
   }
 }

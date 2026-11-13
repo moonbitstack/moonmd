@@ -68,8 +68,10 @@ def render_with_library(node: str, engine: Path, directory: Path) -> dict[str, d
     return json.loads(result.stdout)
 
 
-def render_with_cmark(cmark: str, path: Path) -> str:
+def render_with_cmark(cmark: str, path: Path, smart: bool = False) -> str:
     command = [cmark, "--unsafe"]
+    if smart:
+        command.append("--smart")
     for extension in EXTENSIONS:
         command.extend(["-e", extension])
     command.append(str(path))
@@ -106,6 +108,8 @@ def main() -> int:
     matched_html = 0
     total_round = 0
     matched_round = 0
+    total_smart = 0
+    matched_smart = 0
     failures: list[str] = []
     known: list[str] = []
 
@@ -141,6 +145,17 @@ def main() -> int:
                     failures.append(
                         f"{name} (markdown round trip): {first_difference(again, expected)}"
                     )
+                typed = render_with_cmark(args.cmark, original, smart=True)
+                total_smart += 1
+                if rendered[name]["smart"] == typed:
+                    matched_smart += 1
+                elif name in KNOWN_DIVERGENCES:
+                    known.append(f"{name} (typographic): {KNOWN_DIVERGENCES[name]}")
+                else:
+                    failures.append(
+                        f"{name} (typographic): "
+                        f"{first_difference(rendered[name]['smart'], typed)}"
+                    )
             if not args.quiet:
                 print(f"{flavor}: {count} documents replayed")
 
@@ -152,6 +167,7 @@ def main() -> int:
     print(
         f"html: {matched_html}/{total_html} agree with cmark-gfm; "
         f"markdown written back: {matched_round}/{total_round} read the same; "
+        f"typographic punctuation: {matched_smart}/{total_smart} agree; "
         f"{len(known)} known differences (0.29 against 0.31.2)"
     )
     return 0 if not failures else 1

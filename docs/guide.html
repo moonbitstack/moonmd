@@ -287,7 +287,21 @@ println(plain.html(safe=false))</code></pre>
           <pre><code>&lt;p&gt;~~gone~~&lt;/p&gt;</code></pre>
         </div>
         <p>A flavor is a plain record, so a caller can take <span class="mono">gfm</span> and
-          clear one field without copying the rest by hand.</p>
+          change one field without copying the rest by hand.</p>
+        <p>One field is not an extension. <span class="mono">smart</span> writes the text the way
+          a typesetter would: quotes curl towards what they wrap, two hyphens become a dash and
+          three dots an ellipsis. It is off in both presets, and a code span, an escaped
+          character, an entity and a destination keep what they were written with.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-smart">copy</button></div>
+          <pre><code id="c-smart">let typed : @moonmd.Flavor = { ..@moonmd.gfm, smart: true }
+let page = @moonmd.parse("\"quoted\" -- and...\n"[:], flavor=typed)
+println(page.html(safe=false))</code></pre>
+        </div>
+        <div class="code output" data-lang="html">
+          <div class="code-head"><span>output</span></div>
+          <pre><code>&lt;p&gt;“quoted” – and…&lt;/p&gt;</code></pre>
+        </div>
       </section>
 
       >

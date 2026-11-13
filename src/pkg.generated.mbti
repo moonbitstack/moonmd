@@ -62,6 +62,7 @@ pub(all) struct Flavor {
   task_lists : Bool
   tag_filter : Bool
   footnotes : Bool
+  smart : Bool
 }
 
 pub(all) struct Footnote {

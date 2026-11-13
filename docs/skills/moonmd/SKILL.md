@@ -137,3 +137,6 @@ fn heading_lines(markdown : String) -> Array[Int32] {
   filter are on by default (`Flavor` `gfm`). Pass `flavor=@moonmd.commonmark`
   for plain CommonMark.
 - A footnote reference with no definition stays the text it was written as.
+- `smart` is off in both presets. Pass `flavor={ ..@moonmd.gfm, smart: true }` to
+  get typeset quotes, dashes and ellipses; a code span, an entity and a
+  destination keep what they were written with.

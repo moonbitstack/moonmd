@@ -255,7 +255,7 @@
     </div>
   </div>
 </div>
-<div class="entry" id="api-type-Flavor" data-name="flavor tables strikethrough autolinks task_lists tag_filter footnotes">
+<div class="entry" id="api-type-Flavor" data-name="flavor tables strikethrough autolinks task_lists tag_filter footnotes smart">
   <span class="sig"><span class="kw">pub(all) struct</span> <span class="name">Flavor</span><span class="arg"></span></span>
 <p class="doc-p">What a parser accepts beyond the CommonMark core. The presets <code>commonmark</code> and <code>gfm</code> cover the two dialects this library is asked for; the fields are public so a caller can take one and drop what it does not want.</p>
   <div class="members">
@@ -282,6 +282,10 @@
     <div class="member">
       <span class="sig"><span class="arg">footnotes : Bool</span></span>
 <p class="doc-p"><code>[^label]</code> references with their <code>[^label]:</code> definitions.</p>
+    </div>
+    <div class="member">
+      <span class="sig"><span class="arg">smart : Bool</span></span>
+<p class="doc-p">Typographic punctuation: <code>"x"</code> and <code>'x'</code> curl towards the text they wrap, <code>---</code> and <code>--</code> become an em and an en dash, and <code>...</code> becomes an ellipsis. Code spans, raw HTML and destinations are left as written.</p>
     </div>
   </div>
 </div>

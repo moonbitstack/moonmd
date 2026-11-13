@@ -67,3 +67,26 @@ test "the guide says where a block came from" {
   }
   assert_eq(seen.join("\n"), "lines 1-1\nlines 3-4")
 }
+
+///|
+test "the readme types the text of a smart flavor" {
+  let typed : Flavor = { ..gfm, smart: true, }
+  assert_eq(
+    parse("\"quoted\" -- and...\n"[:], flavor=typed).html(safe=false),
+    "<p>\u{201C}quoted\u{201D} \u{2013} and\u{2026}</p>\n",
+  )
+  assert_eq(
+    parse("`\"--\"`\n"[:], flavor=typed).html(safe=false),
+    "<p><code>&quot;--&quot;</code></p>\n",
+  )
+}
+
+///|
+test "the guide types the text of a smart flavor" {
+  let typed : Flavor = { ..gfm, smart: true, }
+  let page = parse("\"quoted\" -- and...\n"[:], flavor=typed)
+  assert_eq(
+    page.html(safe=false),
+    "<p>\u{201C}quoted\u{201D} \u{2013} and\u{2026}</p>\n",
+  )
+}

@@ -141,6 +141,26 @@ test {
 }
 ```
 
+`smart` is off in both presets, because it writes the text differently rather
+than reading the structure differently: quotes curl towards what they wrap,
+`--` and `---` become dashes, `...` becomes an ellipsis. A code span, an
+escaped character, an entity and a destination keep what they were written
+with.
+
+```moonbit
+test {
+  let typed : @moonmd.Flavor = { ..@moonmd.gfm, smart: true }
+  assert_eq(
+    @moonmd.parse("\"quoted\" -- and...\n"[:], flavor=typed).html(safe=false),
+    "<p>\u{201C}quoted\u{201D} \u{2013} and\u{2026}</p>\n",
+  )
+  assert_eq(
+    @moonmd.parse("`\"--\"`\n"[:], flavor=typed).html(safe=false),
+    "<p><code>&quot;--&quot;</code></p>\n",
+  )
+}
+```
+
 ## Streaming
 
 A model writes a document a token at a time. `Stream::feed` takes whatever has

@@ -15,6 +15,10 @@ pub(all) struct Flavor {
   tag_filter : Bool
   /// `[^label]` references with their `[^label]:` definitions.
   footnotes : Bool
+  /// Typographic punctuation: `"x"` and `'x'` curl towards the text they wrap,
+  /// `---` and `--` become an em and an en dash, and `...` becomes an ellipsis.
+  /// Code spans, raw HTML and destinations are left as written.
+  smart : Bool
 }
 
 ///|
@@ -26,6 +30,7 @@ pub let commonmark : Flavor = {
   task_lists: false,
   tag_filter: false,
   footnotes: false,
+  smart: false,
 }
 
 ///|
@@ -38,6 +43,7 @@ pub let gfm : Flavor = {
   task_lists: true,
   tag_filter: true,
   footnotes: true,
+  smart: false,
 }
 
 ///|

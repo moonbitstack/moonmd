@@ -130,7 +130,13 @@ fn Subject::handle_plain(self : Subject) -> Unit {
   if is_line_end(self.peek(self.pos)) {
     text = rtrim_view(text)
   }
-  let _ = self.add_text(text)
+  if self.flavor.smart {
+    // The run is trimmed the same way first, so the transform sees what is kept.
+    let stop = start + text.length()
+    let _ = self.add_text(smarten_run(self.input, start, stop)[:])
+  } else {
+    let _ = self.add_text(text)
+  }
 }
 
 ///|

@@ -27,9 +27,10 @@ def count_ignored(path: Path) -> int:
 
 
 def flavor_fields(path: Path) -> int:
+    """How many of the flavor's switches the gfm preset turns on."""
     text = path.read_text(encoding="utf-8")
-    block = text.split("pub(all) struct Flavor {", 1)[1].split("\n}", 1)[0]
-    return len(re.findall(r"^\s+\w+ : Bool$", block, re.M))
+    block = text.split("pub let gfm : Flavor = {", 1)[1].split("\n}", 1)[0]
+    return len(re.findall(r"^\s+\w+: true,$", block, re.M))
 
 
 def figures() -> list[tuple[str, str]]:
