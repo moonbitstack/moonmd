@@ -1021,6 +1021,10 @@ h3 {
   margin-top: 34px;
 }
 
+.next a:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .next a {
   background: var(--paper);
   padding: 22px 24px;

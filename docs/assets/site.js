@@ -41,7 +41,9 @@
 
   /* ---------- scroll position ---------- */
 
-  var atTop = true;
+  // Start the other way round, so the first check below marks a page that is
+  // already at the top; the thumb is hidden there by the site's design.
+  var atTop = false;
 
   function markScroll() {
     if (atTop !== (scrollY === 0)) {
