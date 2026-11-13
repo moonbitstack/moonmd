@@ -79,3 +79,36 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           python scripts/check_snippets.py
+
+  reference:
+    permissions:
+      contents: read
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: install moon
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: build the reference implementation
+        run: |
+          git clone --depth 1 --branch 0.29.0.gfm.13 https://github.com/github/cmark-gfm.git "$RUNNER_TEMP/cmark-gfm"
+          cmake -S "$RUNNER_TEMP/cmark-gfm" -B "$RUNNER_TEMP/cmark-gfm/build" \
+            -DCMAKE_BUILD_TYPE=Release -DCMARK_TESTS=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake --build "$RUNNER_TEMP/cmark-gfm/build" -j "$(nproc)"
+          echo "$RUNNER_TEMP/cmark-gfm/build/src" >> "$GITHUB_PATH"
+
+      - name: build the library for node
+        run: |
+          moon update
+          moon build --target js --release src/examples/browser
+          mkdir -p "$RUNNER_TEMP/engine"
+          cp _build/js/release/build/examples/browser/browser.js "$RUNNER_TEMP/engine/moonmd.js"
+
+      - name: the reference reads the same documents the same way
+        run: |
+          python3 scripts/compare_cmark.py --cmark cmark-gfm --engine "$RUNNER_TEMP/engine/moonmd.js"

@@ -177,6 +177,26 @@ the same corpora:
 - feeding an example in pieces of one, two, three, five and eight characters
   gives the same blocks as reading it whole, for the same 652 and 29 examples.
 
+The same documents are read twice more by the reference implementation of the
+specification, once as they are and once as this library writes them back. 670
+of the 681 agree in HTML, and 679 of the 681 agree after a round trip. The
+eleven that do not are examples where CommonMark 0.31.2 changed a rule and the
+reference still follows 0.29:
+
+| Example | What the reference does instead |
+|--:|:--|
+| 28 | turns a character reference above U+10FFFF into U+FFFD; 0.31.2 keeps it as text |
+| 354 | counts a currency sign as punctuation, so `*£*` closes emphasis where 0.31.2 leaves it open |
+| 389 | collapses `__foo, __bar__, baz__` into one strong span |
+| 417 | drops the runs of `foo******bar*********baz` down to one strong span |
+| 425 | collapses `__foo __bar__ baz__` into a single strong span |
+| 426 | collapses `____foo__ bar__` into a single strong span |
+| 427 | collapses `**foo **bar****` into a single strong span |
+| 464 | collapses `****foo****` into a single strong span |
+| 465 | collapses `____foo____` into a single strong span |
+| 466 | collapses `******foo******` into a single strong span |
+| 468 | collapses `_____foo_____` into one strong span inside an emphasis |
+
 ## License
 
 Apache-2.0.
