@@ -232,8 +232,9 @@
 <p class="doc-p">The flavor this document was parsed with.</p>
     </div>
     <div class="member">
-      <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::html</span><span class="arg">(Self, safe? : Bool) -&gt; String</span></span>
+      <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::html</span><span class="arg">(Self, safe? : Bool, xhtml? : Bool) -&gt; String</span></span>
 <p class="doc-p">Render the document as HTML. With <code>safe</code> set, which is the default, raw HTML is escaped and links to dangerous destinations lose their anchor; pass <code>safe=false</code> to write a document that may embed HTML of its own.</p>
+<p class="doc-p"><code>xhtml</code> closes the elements that carry nothing (<code>&lt;br /&gt;</code>, <code>&lt;hr /&gt;</code>, <code>&lt;img /&gt;</code>) the way the reference implementation does; pass <code>xhtml=false</code> for the form a document written to HTML5 uses.</p>
     </div>
     <div class="member">
       <span class="sig"><span class="kw">pub fn</span> <span class="name">Document::lines</span><span class="arg">(Self) -&gt; Array[LineSpan]</span></span>

@@ -14,8 +14,16 @@ let filtered_tags : Array[String] = [
 /// Render the document as HTML. With `safe` set, which is the default, raw HTML
 /// is escaped and links to dangerous destinations lose their anchor; pass
 /// `safe=false` to write a document that may embed HTML of its own.
-pub fn Document::html(self : Document, safe~ : Bool = true) -> String {
-  let out = HtmlOut::new()
+///
+/// `xhtml` closes the elements that carry nothing (`<br />`, `<hr />`, `<img />`)
+/// the way the reference implementation does; pass `xhtml=false` for the form a
+/// document written to HTML5 uses.
+pub fn Document::html(
+  self : Document,
+  safe~ : Bool = true,
+  xhtml~ : Bool = true,
+) -> String {
+  let out = HtmlOut::new(xhtml)
   let permit_html = !safe
   let blocks = self.blocks
   // The footnotes, if there are any, were gathered to the end of the document
@@ -62,11 +70,22 @@ fn find_footnotes_start(blocks : Array[Block]) -> Int32 {
 priv struct HtmlOut {
   buf : StringBuilder
   mut at_line_start : Bool
+  xhtml : Bool
 }
 
 ///|
-fn HtmlOut::new() -> HtmlOut {
-  { buf: StringBuilder(), at_line_start: true, }
+fn HtmlOut::new(xhtml : Bool) -> HtmlOut {
+  { buf: StringBuilder(), at_line_start: true, xhtml, }
+}
+
+///|
+/// The end of an element that carries nothing: ` />` or `>`.
+fn HtmlOut::void_end(self : HtmlOut) -> StringView {
+  if self.xhtml {
+    " />"[:]
+  } else {
+    ">"[:]
+  }
 }
 
 ///|
@@ -248,7 +267,9 @@ fn render_block(
     }
     Break => {
       out.cr()
-      out.put_string("<hr />\n")
+      out.put_string("<hr")
+      out.put(out.void_end())
+      out.put_string("\n")
     }
     Footnote(footnote) => render_footnote(out, footnote, flavor, permit_html)
   }
@@ -360,11 +381,16 @@ fn render_list(
     out.cr()
     out.put_string("<li>")
     match item.task {
-      Checked =>
-        out.put_string(
-          "<input type=\"checkbox\" checked=\"\" disabled=\"\" /> ",
-        )
-      Unchecked => out.put_string("<input type=\"checkbox\" disabled=\"\" /> ")
+      Checked => {
+        out.put_string("<input type=\"checkbox\" checked=\"\" disabled=\"\"")
+        out.put(out.void_end())
+        out.put_string(" ")
+      }
+      Unchecked => {
+        out.put_string("<input type=\"checkbox\" disabled=\"\"")
+        out.put(out.void_end())
+        out.put_string(" ")
+      }
       Plain => ()
     }
     render_blocks(out, item.blocks, flavor, permit_html, list.tight)
@@ -513,7 +539,9 @@ fn render_inline(
       if plain {
         out.put_char(' ')
       } else {
-        out.put_string("<br />\n")
+        out.put_string("<br")
+        out.put(out.void_end())
+        out.put_string("\n")
       }
     Link(link) => {
       let dangerous = is_dangerous_url(link.dest[:])
@@ -592,7 +620,8 @@ fn render_inline(
           out.put_string("\" title=\"")
           out.escaped(image.title[:])
         }
-        out.put_string("\" />")
+        out.put_string("\"")
+        out.put(out.void_end())
       }
     }
     FootnoteRef(fnref) =>

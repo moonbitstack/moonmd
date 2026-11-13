@@ -186,7 +186,10 @@ println(page.html(safe=false))</code></pre>
 &lt;p&gt;&lt;b&gt;bold&lt;/b&gt; &lt;a href="javascript:alert(1)"&gt;x&lt;/a&gt;&lt;/p&gt;</code></pre>
         </div>
         <p>The flag is a rendering choice, not a parsing one: the tree is the same either way, so
-          a viewer can offer both without reading the document twice.</p>
+          a viewer can offer both without reading the document twice. <span class="mono">xhtml</span>
+          is the other one, on by default: it closes the elements that carry nothing, and
+          <span class="mono">xhtml=false</span> ends them at the angle bracket, the way a document
+          written to HTML5 does.</p>
         <div class="callout"><b>safe=false</b> reproduces the HTML the CommonMark examples
           expect, character for character. Keep it for text you control.</div>
       </section>

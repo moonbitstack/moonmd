@@ -131,6 +131,8 @@ fn heading_lines(markdown : String) -> Array[Int32] {
   defined after its use then stays literal.
 - `html` with `safe=false` is what the specification's own examples expect; the
   default is the mode a page that shows untrusted Markdown wants.
+- `html` closes `<br />`, `<hr />` and `<img />` by default; `xhtml=false` ends
+  them at the angle bracket for a document written to HTML5.
 - The tree is a value: `Document::blocks` and `walk` never hand out something you
   can change. Build a document out of blocks with `Document::of_blocks`.
 - Tables, strikethrough, bare links, task list items, footnotes and the tag

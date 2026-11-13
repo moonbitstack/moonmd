@@ -50,8 +50,9 @@ test {
 ```
 
 `html` escapes raw HTML and refuses dangerous destinations unless you pass
-`safe=false`; `markdown` writes the tree back as Markdown that reads the same
-way it did.
+`safe=false`; it closes the elements that carry nothing (`<br />`, `<hr />`,
+`<img />`) unless you pass `xhtml=false`. `markdown` writes the tree back as
+Markdown that reads the same way it did.
 
 ## The tree
 

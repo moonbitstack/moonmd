@@ -75,3 +75,31 @@ test "an image alt text is flattened to text" {
     "<p><img src=\"i\" alt=\"a b c\" /></p>\n",
   )
 }
+
+///|
+test "an element that carries nothing closes itself by default" {
+  let document = @moonmd.parse("---\n\na  \nb\n\n![a](i)\n"[:])
+  assert_eq(
+    document.html(safe=false),
+    "<hr />\n<p>a<br />\nb</p>\n<p><img src=\"i\" alt=\"a\" /></p>\n",
+  )
+}
+
+///|
+test "without xhtml those elements end at the angle bracket" {
+  let document = @moonmd.parse("---\n\na  \nb\n\n![a](i)\n"[:])
+  assert_eq(
+    document.html(safe=false, xhtml=false),
+    "<hr>\n<p>a<br>\nb</p>\n<p><img src=\"i\" alt=\"a\"></p>\n",
+  )
+}
+
+///|
+test "a task list item closes its checkbox the same way" {
+  let document = @moonmd.parse("- [x] done\n- [ ] not\n"[:])
+  assert_eq(
+    document.html(safe=false, xhtml=false),
+    "<ul>\n<li><input type=\"checkbox\" checked=\"\" disabled=\"\"> done</li>\n" +
+    "<li><input type=\"checkbox\" disabled=\"\"> not</li>\n</ul>\n",
+  )
+}
