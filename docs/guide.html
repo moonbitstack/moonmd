@@ -54,15 +54,16 @@
         <li><a href="#install"><span class="n">01</span>install</a></li>
         <li><a href="#document"><span class="n">02</span>a document</a></li>
         <li><a href="#tree"><span class="n">03</span>the tree</a></li>
-        <li><a href="#html"><span class="n">04</span>html</a></li>
-        <li><a href="#markdown"><span class="n">05</span>markdown</a></li>
-        <li><a href="#footnotes"><span class="n">06</span>footnotes</a></li>
-        <li><a href="#stream"><span class="n">07</span>streaming</a></li>
-        <li><a href="#flavors"><span class="n">08</span>flavors</a></li>
+        <li><a href="#lines"><span class="n">04</span>the lines</a></li>
+        <li><a href="#html"><span class="n">05</span>html</a></li>
+        <li><a href="#markdown"><span class="n">06</span>markdown</a></li>
+        <li><a href="#footnotes"><span class="n">07</span>footnotes</a></li>
+        <li><a href="#stream"><span class="n">08</span>streaming</a></li>
+        <li><a href="#flavors"><span class="n">09</span>flavors</a></li>
       </ul>
       <h4>reference</h4>
       <ul>
-        <li><a href="api.html"><span class="n">09</span>api reference</a></li>
+        <li><a href="api.html"><span class="n">10</span>api reference</a></li>
         <li><a href="https://github.com/moonbitstack/moonmd">source</a></li>
       </ul>
     </aside>
@@ -143,8 +144,32 @@ text: two</code></pre>
           string that has to be recognised again later.</p>
       </section>
 
-      <section id="html">
+            <section id="lines">
         <p class="kicker"><span>§04</span></p>
+        <h2>Where a block came from</h2>
+        <p>A block knows the lines it was read from, counted from one and in the order of
+          <span class="mono">blocks()</span>. That is what cutting a document by heading needs, and
+          what points a reader back at the text behind a node.</p>
+        <div class="code" data-lang="moonbit">
+          <div class="code-head"><span>moonbit</span><span class="spacer"></span><button class="copy" type="button" data-copy="c-lines">copy</button></div>
+          <pre><code id="c-lines">let document = @moonmd.parse("# Notes\n\ntwo\nthree\n"[:])
+for span in document.lines() {
+  println("lines \{span.first}-\{span.last}")
+}</code></pre>
+        </div>
+        <div class="code output" data-lang="text">
+          <div class="code-head"><span>output</span></div>
+          <pre><code>lines 1-1
+lines 3-4</code></pre>
+        </div>
+        <p>Blank lines between blocks belong to neither. A container reports the lines of
+          everything inside it, a fenced block keeps its blank lines and its closing fence, and a
+          table keeps its delimiter row. A document assembled with
+          <span class="mono">of_blocks</span> was not read from text, so it reports no lines.</p>
+      </section>
+
+<section id="html">
+        <p class="kicker"><span>§05</span></p>
         <h2>HTML</h2>
         <p class="intro"><span class="mono">html</span> takes one flag. With the default
           <span class="mono">safe=true</span>, raw HTML is escaped and a destination that would
@@ -167,7 +192,7 @@ println(page.html(safe=false))</code></pre>
       </section>
 
       <section id="markdown">
-        <p class="kicker"><span>§05</span></p>
+        <p class="kicker"><span>§06</span></p>
         <h2>Markdown</h2>
         <p>The same tree writes itself back out. The writer escapes what would otherwise start a
           block, and grows a fence past any run of its own characters inside the code, so the
@@ -188,7 +213,7 @@ A *small* page.</code></pre>
       </section>
 
       <section id="footnotes">
-        <p class="kicker"><span>§06</span></p>
+        <p class="kicker"><span>§07</span></p>
         <h2>Footnotes</h2>
         <p class="intro"><span class="mono">gfm</span> also reads footnotes: a
           <span class="mono">[^label]</span> in the text is a reference, and a line that opens
@@ -218,7 +243,7 @@ println(document.html(safe=false))</code></pre>
       </section>
 
       <section id="stream">
-        <p class="kicker"><span>§07</span></p>
+        <p class="kicker"><span>§08</span></p>
         <h2>Streaming</h2>
         <p class="intro"><span class="mono">feed</span> takes the next chunk and returns the blocks
           that no later text can change. <span class="mono">finish</span> returns what is left. A
@@ -246,7 +271,7 @@ println(stream.finish().length())</code></pre>
       </section>
 
       <section id="flavors">
-        <p class="kicker"><span>§08</span></p>
+        <p class="kicker"><span>§09</span></p>
         <h2>Flavors</h2>
         <p class="intro"><span class="mono">gfm</span> is the default: CommonMark plus tables,
           strikethrough, bare links, task list markers, footnotes and the tag filter.

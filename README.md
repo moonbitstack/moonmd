@@ -74,6 +74,27 @@ test {
 }
 ```
 
+## Where a block came from
+
+`lines` gives the lines of the source each block at the top of the document was
+read from, counted from one, in the same order as `blocks()`. Blank lines
+between blocks belong to neither, and a container reports the lines of
+everything inside it.
+
+```moonbit
+test {
+  let document = @moonmd.parse("# One\n\ntwo\nthree\n")
+  let spans = document.lines()
+  assert_eq((spans[0].first, spans[0].last), (1, 1))
+  assert_eq((spans[1].first, spans[1].last), (3, 4))
+}
+```
+
+That is what cutting a document by heading needs: the lines of a heading open
+the next piece, and the block after it starts the one before. A document
+assembled from blocks with `of_blocks` was not read from text, so it reports no
+lines.
+
 ## Footnotes
 
 A `[^label]` in the text is a footnote reference; a line that opens with
@@ -156,6 +177,12 @@ test {
 ```
 
 With `safe=false` the document is written as it was read.
+
+A document that nests deeper than a hundred blocks, or a hundred inline spans
+inside each other, stops there: the marker that would open the next one stays
+in the text. Both the tree and the HTML are produced by walking containers, so
+a document that nests deeper than that would end the process rather than the
+document.
 
 ## Conformance
 

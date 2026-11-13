@@ -103,6 +103,26 @@ fn footnote_labels(markdown : String) -> Array[String] {
 }
 ```
 
+## Find where a heading sits
+
+`lines` gives the source lines each block at the top of the document was read
+from, in the same order as `blocks()`, so the two line up by index. A heading
+that starts at line n opens a section; the block after it starts the one before.
+
+```moonbit
+fn heading_lines(markdown : String) -> Array[Int32] {
+  let document = @moonmd.parse(markdown[:])
+  let spans = document.lines()
+  let found : Array[Int32] = []
+  for i, block in document.blocks() {
+    if block is @moonmd.Heading(_) && i < spans.length() {
+      found.push(spans[i].first)
+    }
+  }
+  found
+}
+```
+
 ## Rules that catch people out
 
 - A block that mentions `[` waits for `finish` by default, because a link

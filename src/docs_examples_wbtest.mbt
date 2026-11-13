@@ -57,3 +57,13 @@ test "the guide turns an extension off" {
   let plain = parse("~~gone~~\n"[:], flavor=commonmark)
   assert_eq(plain.html(safe=false), "<p>~~gone~~</p>\n")
 }
+
+///|
+test "the guide says where a block came from" {
+  let document = parse("# Notes\n\ntwo\nthree\n"[:])
+  let seen : Array[String] = []
+  for span in document.lines() {
+    seen.push("lines \{span.first}-\{span.last}")
+  }
+  assert_eq(seen.join("\n"), "lines 1-1\nlines 3-4")
+}
