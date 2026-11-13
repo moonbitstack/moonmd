@@ -4,9 +4,12 @@
 // specification describes, with tabs measured in columns of four.
 
 ///|
-/// The most list nesting the parser follows, so that a hostile document cannot
-/// exhaust the stack.
-const MAX_LIST_DEPTH : Int32 = 100
+/// The deepest a block may sit inside other blocks. Every container is walked
+/// again when the tree is built and when it is written out, so a document that
+/// nests deeper than this would run out of stack; past it the marker is left
+/// in the text instead of opening one more container. A hundred is the depth
+/// the other implementations settle on.
+const MAX_NESTING : Int32 = 100
 
 ///|
 /// The indentation that starts an indented code block.
@@ -439,9 +442,8 @@ fn BlockParser::open_new_blocks(
   let mut container = container
   let mut maybe_lazy = self.tree.nodes[self.current].kind == Paragraph
   let mut cont_type = self.tree.nodes[container].kind
-  let mut depth = 0
   while cont_type != Code && cont_type != Html {
-    depth = depth + 1
+    let depth = self.tree.depth(container)
     self.find_first_nonspace()
     let indented = self.indent >= CODE_INDENT
     let first = self.first_nonspace
@@ -472,14 +474,14 @@ fn BlockParser::open_new_blocks(
     } else {
       0
     }
-    let foot = if !indented && self.flavor.footnotes && depth < MAX_LIST_DEPTH {
+    let foot = if !indented && self.flavor.footnotes && depth < MAX_NESTING {
       scan_footnote_definition(text, first)
     } else {
       0
     }
     let marker = if (!indented || cont_type == List) &&
       self.indent < CODE_INDENT &&
-      depth < MAX_LIST_DEPTH {
+      depth < MAX_NESTING {
       parse_list_marker(text, first, cont_type == Paragraph)
     } else {
       None
@@ -490,7 +492,7 @@ fn BlockParser::open_new_blocks(
     } else {
       html_start_seven
     }
-    if !indented && self.peek(first) == 0x3E {
+    if !indented && self.peek(first) == 0x3E && depth < MAX_NESTING {
       let start = first
       self.advance_offset(start + 1 - self.offset, false)
       if is_space_or_tab(self.peek(self.offset)) {

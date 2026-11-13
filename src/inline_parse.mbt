@@ -448,7 +448,8 @@ fn Subject::handle_close_bracket(self : Subject) -> Unit {
   if !matched &&
     self.flavor.footnotes &&
     !is_image &&
-    self.peek(self.brackets[opener].body_start) == 0x5E {
+    self.peek(self.brackets[opener].body_start) == 0x5E &&
+    self.tree.takes_within_limit(self.brackets[opener].inl) {
     // `[^label]` is a footnote reference: it points at a definition by its
     // label, which is resolved to a number when the document is rendered. The
     // label is taken from the source between the caret and the close.
@@ -474,7 +475,7 @@ fn Subject::handle_close_bracket(self : Subject) -> Unit {
       return
     }
   }
-  if !matched {
+  if !matched || !self.tree.takes_within_limit(self.brackets[opener].inl) {
     self.pop_bracket()
     self.pos = initial_pos
     let _ = self.add_text("]")

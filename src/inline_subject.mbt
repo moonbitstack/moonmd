@@ -30,6 +30,9 @@ priv struct InlineNode {
   mut text : String
   /// How much of `text` is still in use: a delimiter run shrinks as it pairs up.
   mut text_len : Int32
+  /// How tall the subtree under this node is: zero for a node with nothing
+  /// inside it.
+  mut nest : Int32
   title : String
 }
 
@@ -50,6 +53,7 @@ fn InlineTree::new() -> InlineTree {
     prev: -1,
     text: "",
     text_len: 0,
+    nest: 0,
     title: "",
   })
   tree
@@ -72,6 +76,7 @@ fn InlineTree::make(
     prev: -1,
     text,
     text_len,
+    nest: 0,
     title,
   })
   self.nodes.length() - 1
@@ -93,6 +98,10 @@ fn InlineTree::append_child(
     self.nodes[parent].first_child = child
   }
   self.nodes[parent].last_child = child
+  let height = self.nodes[child].nest + 1
+  if height > self.nodes[parent].nest {
+    self.nodes[parent].nest = height
+  }
 }
 
 ///|
@@ -112,6 +121,41 @@ fn InlineTree::insert_after(
   } else {
     self.nodes[parent].last_child = node
   }
+}
+
+///|
+/// How tall the container that wraps the siblings between `first` and `last`
+/// would be. Used before making one: the tree is walked again when it is turned
+/// into `Inline` values and when it is written out, so a document that nests
+/// deeper than the limit would run out of stack.
+fn InlineTree::wraps_within_limit(
+  self : InlineTree,
+  first : Int32,
+  last : Int32,
+) -> Bool {
+  let mut tallest = 0
+  let mut node = self.nodes[first].next
+  while node >= 0 && node != last {
+    if self.nodes[node].nest > tallest {
+      tallest = self.nodes[node].nest
+    }
+    node = self.nodes[node].next
+  }
+  tallest + 1 <= MAX_NESTING
+}
+
+///|
+/// The same question for a container that takes everything after `first`.
+fn InlineTree::takes_within_limit(self : InlineTree, first : Int32) -> Bool {
+  let mut tallest = 0
+  let mut node = self.nodes[first].next
+  while node >= 0 {
+    if self.nodes[node].nest > tallest {
+      tallest = self.nodes[node].nest
+    }
+    node = self.nodes[node].next
+  }
+  tallest + 1 <= MAX_NESTING
 }
 
 ///|

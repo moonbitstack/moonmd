@@ -230,3 +230,16 @@ fn Tree::last_child_is_open(self : Tree, index : Int32) -> Bool {
   let last = self.nodes[index].last_child
   last >= 0 && self.nodes[last].open
 }
+
+///|
+/// How many blocks a node sits inside: the document itself is zero, a block
+/// directly under it is one.
+fn Tree::depth(self : Tree, index : Int32) -> Int32 {
+  let mut depth = 0
+  let mut node = index
+  while node > 0 {
+    depth = depth + 1
+    node = self.nodes[node].parent
+  }
+  depth
+}

@@ -44,7 +44,11 @@ fn Subject::process_emphasis(self : Subject, stack_bottom : Int32) -> Unit {
         opener = self.delims[opener].prev
       }
       let old_closer = closer
-      if opener_found {
+      if opener_found &&
+        self.tree.wraps_within_limit(
+          self.delims[opener].inl,
+          self.delims[old_closer].inl,
+        ) {
         if ch == 0x7E {
           closer = self.insert_strike(opener, old_closer)
         } else {
