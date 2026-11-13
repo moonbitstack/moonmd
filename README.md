@@ -18,6 +18,7 @@
   <a href="#install">Install</a> ·
   <a href="#read-a-document">Read a document</a> ·
   <a href="#the-tree">The tree</a> ·
+  <a href="#where-a-block-came-from">Where a block came from</a> ·
   <a href="#footnotes">Footnotes</a> ·
   <a href="#flavors">Flavors</a> ·
   <a href="#streaming">Streaming</a> ·
